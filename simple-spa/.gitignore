@@ -1,0 +1,8 @@
+node_modules
+.env
+.DS_Store
+src/client/public/js/dev
+src/client/public/js/dist
+src/client/public/css
+gc-itis-iam-writer-key.json
+gc-itis-iam-reader-key.json
