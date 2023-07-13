@@ -7,9 +7,7 @@ import serverConfig from "../../lib/serverConfig.js";
 const config = {
   fileName: serverConfig.assetFileNames.js,
   cssFileName: serverConfig.assetFileNames.css,
-
-  // TODO: Replace with your app's entry point
-  entry: '../js/ucdlib-simple-spa.js',
+  entry: '../js/app-main.js',
   publicDir: '../public',
   clientModules: [
     '../node_modules',

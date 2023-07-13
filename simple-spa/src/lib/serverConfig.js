@@ -6,12 +6,13 @@ class ServerConfig {
 
     this.version = this.getEnv('APP_VERSION', '0.0.9');
     this.env = process?.env?.APP_ENV === 'dev' ? 'dev' : 'prod';
+    this.env = 'dev'; // STEVE: REMOVE ME
 
     // TODO: Replace these with your own app title
     this.title = this.getEnv('APP_TITLE', 'UC Davis Library Simple SPA');
 
     // TODO: Replace these with the routes that your SPA should handle
-    this.routes = ['foo', 'bar'];
+    this.routes = ['foo'];
 
     this.port = {
       container: this.getEnv('APP_CONTAINER_PORT', 3000), // server port within docker container
@@ -26,6 +27,21 @@ class ServerConfig {
 
     // sets robots meta tag to discourage search engines from indexing the site
     this.discourageRobots = this.getEnv('APP_DISCOURAGE_ROBOTS', true);
+
+    // TODO: Review auth settings
+    // Made available to the browser-side app, so don't put any secrets here.
+    this.auth = {
+      // forces browser-side authentication. Browser then passes auth token to server.
+      requireAuth: this.getEnv('APP_REQUIRE_AUTH', true), // STEVE: CHANGE ME
+
+      // passed to the browser-side keycloak library initialization
+      keycloakJsClient: {
+        url: this.getEnv('APP_KEYCLOAK_URL', 'https://sandbox.auth.library.ucdavis.edu'),
+        realm: this.getEnv('APP_KEYCLOAK_REALM', 'internal'),
+        clientId: this.getEnv('APP_KEYCLOAK_CLIENT_ID', 'simple-spa-client')
+      },
+      oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile roles ucd-ids'),
+    };
   }
 
   /**

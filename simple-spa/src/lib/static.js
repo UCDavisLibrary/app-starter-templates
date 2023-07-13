@@ -26,8 +26,9 @@ export default (app) => {
 
     getConfig : async (req, res, next) => {
       next({
-        appRoutes : config.routes,
-        version: config.version
+        routes : config.routes,
+        version: config.version,
+        title: config.title
       });
     },
 

@@ -14,7 +14,8 @@ To use this template when starting your own application:
 1. Clone/checkout this repo.
 2. `cp -R ./simple-spa path/to/your/app`
 3. Search for `TODO:` in the project, and follow corresponding instructions
-4. Replace this readme with your own
+4. Clean up your repository... replace this readme, delete todos, etc.
+
 
 ## Directory Structure
 
