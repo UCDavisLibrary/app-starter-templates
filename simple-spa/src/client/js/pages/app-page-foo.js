@@ -8,15 +8,16 @@ export default class AppPageFoo extends Mixin(LitElement)
 
   static get properties() {
     return {
-
+      fooData: {type: Array}
     }
   }
 
   constructor() {
     super();
     this.render = render.bind(this);
+    this.fooData = [];
 
-    this._injectModel('AppStateModel');
+    this._injectModel('AppStateModel', 'FooModel');
   }
 
   /**
@@ -31,9 +32,10 @@ export default class AppPageFoo extends Mixin(LitElement)
    * @description bound to AppStateModel app-state-update event
    * @param {Object} state - AppStateModel state
    */
-  _onAppStateUpdate(state) {
+  async _onAppStateUpdate(state) {
     if ( this.id !== state.page ) return;
 
+    this.AppStateModel.showLoading();
     this.AppStateModel.setTitle('Foo');
 
     const breadcrumbs = [
@@ -41,6 +43,30 @@ export default class AppPageFoo extends Mixin(LitElement)
       this.AppStateModel.store.breadcrumbs.foo
     ];
     this.AppStateModel.setBreadcrumbs(breadcrumbs);
+
+    const d = await this.getPageData();
+    const hasError = d.some(e => e.state === 'error');
+    if ( !hasError ) this.AppStateModel.showLoaded(this.id);
+
+  }
+
+  /**
+   * @description Get any data required for rendering this page
+   */
+  async getPageData(){
+    const promises = [];
+    promises.push(this.FooModel.getFoo());
+    const resolvedPromises = await Promise.all(promises);
+    return resolvedPromises;
+  }
+
+  _onFooFetched(e) {
+    if ( e.state === 'loaded' ) {
+      this.fooData = e.payload;
+    } else if ( e.state === 'error' ) {
+      this.fooData = [];
+      this.AppStateModel.showError(e);
+    }
   }
 
 }

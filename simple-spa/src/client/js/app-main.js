@@ -20,8 +20,18 @@ import { appConfig, LitCorkUtils, Mixin } from "../../lib/appGlobals.js";
 import AppStateModel from "../../lib/cork/models/AppStateModel.js";
 AppStateModel.init(appConfig.routes);
 
+// import data models
+// TODO: Replace with your own models
+import "../../lib/cork/models/FooModel.js";
+
+// auth
+// TODO: If not using auth, you can remove these imports
+import Keycloak from 'keycloak-js';
+import AuthModel from "../../lib/cork/models/AuthModel.js";
+
 // registry of app page bundles - pages are dynamically loaded on appStateUpdate
 import bundles from "./pages/bundles/index.js";
+import "./pages/app-page-alt-state.js";
 
 /**
  * @class AppMain
@@ -39,7 +49,9 @@ export default class AppMain extends Mixin(LitElement)
       showBreadcrumbs: {type: Boolean},
       userIsAuthenticated: {type: Boolean},
       appTitle: {type: String},
-      pageIsLoaded: {state: true}
+      pageIsLoaded: {state: true},
+      pageState: {state: true},
+      errorMessage: {state: true}
     }
   }
 
@@ -57,9 +69,16 @@ export default class AppMain extends Mixin(LitElement)
     this.pageIsLoaded = false;
 
     this._notLoadedPageId = 'page-not-loaded';
+    this.pageState = 'loading';
+    this.errorMessage = '';
 
-    this._injectModel('AppStateModel');
+    const models = ['AppStateModel'];
+    if ( appConfig.auth.requireAuth ) {
+      models.push('AuthModel');
+    }
+    this._injectModel(...models);
     this.page = this.AppStateModel.store.defaultPage;
+    this.AppStateModel.refresh();
   }
 
   /**
@@ -115,11 +134,37 @@ export default class AppMain extends Mixin(LitElement)
     // in which case we need to fire it again
     if ( !bundleAlreadyLoaded ){
       this.AppStateModel.refresh();
-      //AuthModel._onAuthRefreshSuccess();
+      if ( AuthModel._init ) {
+        AuthModel._onAuthRefreshSuccess();
+      }
     }
 
     this.page = page;
     window.scroll(0,0);
+  }
+
+  /**
+   * @description bound to AppStateModel page-state-update event
+   * Shows loading/error page instead of requested page if page is not loaded
+   * Otherwise reselects the requested page
+   * @param {Object} e - AppStateModel page-state-update event
+   */
+  _onPageStateUpdate(e) {
+    const { state } = e;
+    this.pageState = state;
+    if ( state === 'error' ) {
+      this.errorMessage = e.errorMessage;
+    }
+    this.page = e.state === 'loaded' ? e.page : this._notLoadedPageId;
+  }
+
+  /**
+   * @description Listens for token-refreshed event from AuthModel
+   * Fires when token is first created and when it is refreshed
+   * @param {AccessToken} token - AccessToken instance from utils/AccessToken.js
+   */
+  _onTokenRefreshed(token) {
+    this.userIsAuthenticated = !token.isEmpty;
   }
 
   /**
@@ -178,4 +223,37 @@ export default class AppMain extends Mixin(LitElement)
 
 }
 
-customElements.define('app-main', AppMain);
+// init app by doing auth (if required) and defining the main app element
+(async () => {
+  if ( !appConfig.auth.requireAuth ) {
+    customElements.define('app-main', AppMain);
+    return;
+  }
+
+  // instantiate keycloak instance and save in appConfig global
+  appConfig.auth.keycloakClient = new Keycloak({...appConfig.auth.clientInit, checkLoginIframe: true});
+  const kc = appConfig.auth.keycloakClient;
+  const silentCheckSsoRedirectUri = `${window.location.origin}/${AuthModel.silentCheckSsoRedirectUri}`
+
+  // set up listeners keycloak listeners
+  kc.onAuthRefreshError = () => {AuthModel.logout();};
+  kc.onAuthError = () => {AuthModel.redirectUnauthorized();};
+  kc.onAuthSuccess = () => {
+    customElements.define('app-main', AppMain);
+    AuthModel.init();
+    AuthModel._onAuthRefreshSuccess();
+  };
+  kc.onAuthRefreshSuccess = () => {AuthModel._onAuthRefreshSuccess();};
+
+  // initialize auth
+  await kc.init({
+    onLoad: 'check-sso',
+    silentCheckSsoRedirectUri,
+    scope: appConfig.auth.oidcScope
+  });
+  if ( !kc.authenticated) {
+    await kc.login();
+  }
+
+})();
+

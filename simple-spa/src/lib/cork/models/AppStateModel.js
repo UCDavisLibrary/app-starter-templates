@@ -137,30 +137,45 @@ class AppStateModelImpl extends AppStateModel {
 
   /**
    * @description Show the app's loading page
-   * @param {String} returnPage The page to set when loading is complete and showLoaded method is called
    */
-  showLoading(returnPage){
-    if ( returnPage ) {
-      this.store.lastPage = returnPage;
-    }
-    this.store.emit('app-status-change', {status: 'loading'});
+  showLoading(){
+    this.store.emit('page-state-update', {state: 'loading'});
   }
 
   /**
    * @description Show the app's error page
-   * @param {String} msg Error message to show
+   * @param {String|Object} msg Error message to show or cork-app-utils response object
    */
   showError(msg=''){
-    this.store.emit('app-status-change', {status: 'error', errorMessage: msg});
+    let errorMessage = ''
+    if ( typeof msg === 'object' ) {
+      console.error(msg);
+      if ( msg?.error?.response?.status == 404 ){
+        errorMessage = 'Page not found';
+      } else if ( msg?.error?.response?.status == 401 ){
+        errorMessage = 'You need to authenticate to view this page';
+      } else if ( msg?.error?.response?.status == 403 ){
+        errorMessage = 'You are not authorized to view this page';
+      }else if ( msg?.error?.message ) {
+        errorMessage = msg?.error?.message;
+      }
+    } else {
+      errorMessage = msg;
+    }
+    this.store.emit('page-state-update', {state: 'error', errorMessage});
   }
 
   /**
    * @description Return app to a non-error/non-loading status
-   * @param {String} page - Optional. The page to show.
+   * @param {String} page - The page to show.
    */
   showLoaded(page){
-    page = page || this.store.lastPage;
-    this.store.emit('app-status-change', {status: 'loaded', page});
+    if ( page ){
+      this.store.emit('page-state-update', {state: 'loaded', page});
+    } else {
+      console.warn('showLoaded called without page argument');
+    }
+
   }
 
   /**

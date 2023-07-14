@@ -27,8 +27,14 @@ export default (app) => {
     getConfig : async (req, res, next) => {
       next({
         routes : config.routes,
+        apiRoot : config.apiRoot,
         version: config.version,
-        title: config.title
+        title: config.title,
+        auth: {
+          requireAuth: config.auth.requireAuth,
+          clientInit: config.auth.keycloakJsClient,
+          oidcScope: config.auth.oidcScope
+        }
       });
     },
 

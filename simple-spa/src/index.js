@@ -1,13 +1,14 @@
 import express from 'express';
 import serverConfig from './lib/serverConfig.js';
 import setUpStaticRoutes from './lib/static.js';
+import setUpApiRoutes from "./api/index.js"
 
 const app = express();
 
 app.use(express.json());
 
 // setup api routes
-//require('./api')(app);
+setUpApiRoutes(app);
 
 // setup static app routes including spa
 setUpStaticRoutes(app);

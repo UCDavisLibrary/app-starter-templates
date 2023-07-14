@@ -1,5 +1,6 @@
 /**
  * @description Server configuration file. Reads environment variables and sets defaults.
+ * To pass any of these variables to the browser, see static.js
  */
 class ServerConfig {
   constructor() {
@@ -13,6 +14,8 @@ class ServerConfig {
 
     // TODO: Replace these with the routes that your SPA should handle
     this.routes = ['foo'];
+
+    this.apiRoot = this.getEnv('APP_API_ROOT', '/api');
 
     this.port = {
       container: this.getEnv('APP_CONTAINER_PORT', 3000), // server port within docker container
@@ -32,7 +35,7 @@ class ServerConfig {
     // Made available to the browser-side app, so don't put any secrets here.
     this.auth = {
       // forces browser-side authentication. Browser then passes auth token to server.
-      requireAuth: this.getEnv('APP_REQUIRE_AUTH', true), // STEVE: CHANGE ME
+      requireAuth: this.getEnv('APP_REQUIRE_AUTH', true),
 
       // passed to the browser-side keycloak library initialization
       keycloakJsClient: {
@@ -40,7 +43,7 @@ class ServerConfig {
         realm: this.getEnv('APP_KEYCLOAK_REALM', 'internal'),
         clientId: this.getEnv('APP_KEYCLOAK_CLIENT_ID', 'simple-spa-client')
       },
-      oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile roles ucd-ids'),
+      oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile roles ucd-ids')
     };
   }
 
