@@ -6,3 +6,5 @@ src/client/public/js/dist
 src/client/public/css
 gc-itis-iam-writer-key.json
 gc-itis-iam-reader-key.json
+#TODO: replace with your own local dev directory
+simple-spa-local-dev

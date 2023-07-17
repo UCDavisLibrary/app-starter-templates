@@ -7,7 +7,6 @@ class ServerConfig {
 
     this.version = this.getEnv('APP_VERSION', '0.0.9');
     this.env = process?.env?.APP_ENV === 'dev' ? 'dev' : 'prod';
-    this.env = 'dev'; // STEVE: REMOVE ME
 
     // TODO: Replace these with your own app title
     this.title = this.getEnv('APP_TITLE', 'UC Davis Library Simple SPA');
@@ -43,7 +42,8 @@ class ServerConfig {
         realm: this.getEnv('APP_KEYCLOAK_REALM', 'internal'),
         clientId: this.getEnv('APP_KEYCLOAK_CLIENT_ID', 'simple-spa-client')
       },
-      oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile roles ucd-ids')
+      oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile roles ucd-ids'),
+      serverCacheExpiration: this.getEnv('APP_SERVER_CACHE_EXPIRATION', '10 minutes')
     };
   }
 

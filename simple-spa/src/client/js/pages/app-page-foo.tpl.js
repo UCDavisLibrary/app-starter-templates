@@ -9,7 +9,7 @@ return html`
         ${this.fooData.length ? html`
           <ul>
             ${this.fooData.map(item => html`
-              <li>${item}</li>
+              <li>${item.name}</li>
             `)}
           </ul>
         ` : html`

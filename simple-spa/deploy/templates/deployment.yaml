@@ -1,0 +1,27 @@
+version: '3'
+services:
+  app:
+    image: {{APP_IMAGE_NAME_TAG}}
+    env_file:
+      - .env
+    ports:
+      - ${APP_HOST_PORT:-3000}:${APP_CONTAINER_PORT:-3000}
+    depends_on:
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+    command: node index.js
+  db:
+    image: {{POSTGRES_IMAGE_NAME_TAG}}
+    env_file:
+      - .env
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+    volumes:
+      - db-data:/var/lib/postgresql/data
+volumes:
+  db-data:

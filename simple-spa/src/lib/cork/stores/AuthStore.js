@@ -1,5 +1,5 @@
 import {BaseStore} from '@ucd-lib/cork-app-utils';
-import AccessToken from '../../utils/accessToken.js';
+import AccessToken from '../../utils/AccessToken.js';
 
 class AuthStore extends BaseStore {
 
