@@ -15,7 +15,7 @@ if [[ -z $CLOUD_BUILD ]]; then
   export DOCKER_BUILDKIT=1
 fi
 
-# Application
+# Application with init/backup utilities
 docker build \
   -t $APP_IMAGE_NAME_TAG \
   --cache-from=$APP_IMAGE_NAME:$CONTAINER_CACHE_TAG \
@@ -24,4 +24,4 @@ docker build \
   --build-arg BUILD_NUM=${BUILD_NUM} \
   --build-arg BUILD_TIME=${BUILD_TIME} \
   --build-arg APP_VERSION=${APP_VERSION} \
-  $SRC_DIR
+  $ROOT_DIR

@@ -22,6 +22,17 @@ for key in $(compgen -v); do
 done
 echo "$content" > ../docker-compose.yaml
 
+# apache conf file
+content=$(cat apache.conf)
+for key in $(compgen -v); do
+  if [[ $key == "COMP_WORDBREAKS" || $key == "content" || $key == "GOOGLE_KEY_FILE_CONTENT" ]]; then
+    continue;
+  fi
+  escaped=$(printf '%s\n' "${!key}" | sed -e 's/[\/&]/\\&/g')
+  content=$(echo "$content" | sed "s/{{$key}}/${escaped}/g")
+done
+echo "$content" > ../apache.conf
+
 # generate local development dc file
 content=$(cat local-dev.yaml)
 LOCAL_BUILD=true source ../config.sh

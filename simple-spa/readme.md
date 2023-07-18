@@ -23,6 +23,10 @@ To use this template when starting your own application:
 deploy:
   desc: Scripts for building/deploying app on your local machine and/or a server
   items:
+    - cmds: Deploy/devops scripts
+    - db-entrypoint: SQL files that run on container start if db is empty
+    - templates: Handlebar-style templates of deployment files
+    - utils: Deployment utilities, such as data init and backup
 
 src:
   desc: Application source code

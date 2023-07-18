@@ -20,6 +20,12 @@ APP_VERSION=v0.0.9.${BUILD_NUM}
 # So make it descriptive
 APP_SLUG=simple-spa
 
+# App url and ports
+APP_HOST=localhost:3000
+APP_URL=http://$APP_HOST
+APP_HOST_PORT=3000
+APP_CONTAINER_PORT=3000
+
 # Repository tags/branchs
 # Tags should always be used for production deployments
 # Branches can be used for development deployments
@@ -71,3 +77,10 @@ NPM_PACKAGES=(
 JS_BUNDLES=(
   $CLIENT_DIR
 )
+
+# TODO: If using init/backup utilities, set the following
+# Google Cloud
+GC_READER_KEY_SECRET="" # name of secret in secret manager for reading from bucket
+GC_WRITER_KEY_SECRET="" # name of secret in secret manager for writing to bucket
+GC_BACKUP_BUCKET="" # name of bucket that will be used for database backups
+BACKUP_FILE_NAME="db.sql.gz"
