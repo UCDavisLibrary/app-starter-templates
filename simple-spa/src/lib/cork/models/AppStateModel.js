@@ -1,5 +1,6 @@
 import {AppStateModel} from '@ucd-lib/cork-app-state';
 import AppStateStore from '../stores/AppStateStore.js';
+import { appConfig } from '../../appGlobals.js';
 
 /**
  * @description Model for handling generic app state, such as routing
@@ -10,6 +11,10 @@ class AppStateModelImpl extends AppStateModel {
     super();
 
     this.store = AppStateStore;
+
+    if ( appConfig.auth?.requireAuth ) {
+      this.inject('AuthModel');
+    }
   }
 
   /**
@@ -19,6 +24,11 @@ class AppStateModelImpl extends AppStateModel {
    */
   set(update) {
 
+    if ( this.AuthModel && this.AuthModel.logOutRequested(update.location) ){
+      this.showLoading();
+      this.AuthModel.logout();
+      return;
+    }
     this.stripStateFromHash(update);
     this._setPage(update);
     this.setBreadcrumbs(false, update);

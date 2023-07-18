@@ -11,7 +11,7 @@ import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
 import '@fortawesome/fontawesome-free/js/all.js';
 
 // global event bus and model registry
-import "@ucd-lib/cork-app-utils";
+import { Registry } from '@ucd-lib/cork-app-utils';
 
 // app globals - should be loaded after cork-app-utils
 import { appConfig, LitCorkUtils, Mixin } from "../../lib/appGlobals.js";
@@ -28,6 +28,8 @@ import "../../lib/cork/models/FooModel.js";
 // TODO: If not using auth, you can remove these imports
 import Keycloak from 'keycloak-js';
 import AuthModel from "../../lib/cork/models/AuthModel.js";
+
+Registry.ready();
 
 // registry of app page bundles - pages are dynamically loaded on appStateUpdate
 import bundles from "./pages/bundles/index.js";

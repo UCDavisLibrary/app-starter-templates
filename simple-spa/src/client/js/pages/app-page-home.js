@@ -30,8 +30,9 @@ export default class AppPageHome extends Mixin(LitElement)
    * @description bound to AppStateModel app-state-update event
    * @param {Object} state - AppStateModel state
    */
-  _onAppStateUpdate(state) {
+  async _onAppStateUpdate(state) {
     if ( this.id !== state.page ) return;
+    // this.AppStateModel.showLoading();
 
     this.AppStateModel.setTitle('Home Page');
 
@@ -39,6 +40,20 @@ export default class AppPageHome extends Mixin(LitElement)
       this.AppStateModel.store.breadcrumbs.home
     ];
     this.AppStateModel.setBreadcrumbs(breadcrumbs);
+
+    // const d = await this.getPageData();
+    // const hasError = d.some(e => e.state === 'error');
+    // if ( !hasError ) this.AppStateModel.showLoaded(this.id);
+  }
+
+  /**
+   * @description Get any data required for rendering this page
+   */
+  async getPageData(){
+    const promises = [];
+    //promises.push(this.YourModel.getData());
+    const resolvedPromises = await Promise.all(promises);
+    return resolvedPromises;
   }
 
 }

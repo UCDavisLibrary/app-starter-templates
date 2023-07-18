@@ -1,5 +1,6 @@
 import {BaseModel} from '@ucd-lib/cork-app-utils';
 import AuthStore from '../stores/AuthStore.js';
+import AuthService from '../services/AuthService.js';
 import { appConfig } from '../../appGlobals.js';
 
 /**
@@ -11,6 +12,7 @@ class AuthModel extends BaseModel {
     super();
 
     this.store = AuthStore;
+    this.service = AuthService;
 
     // Lifespan of client access token entered in keycloak
     this.tokenRefreshRate = 300;
@@ -46,7 +48,8 @@ class AuthModel extends BaseModel {
   /**
    * @description Logs user out of application
    */
-   logout(){
+   async logout(){
+    await this.clearTokenServerCache();
     const redirectUri = window.location.origin + '/logged-out.html';
     try {
       this.client.logout({redirectUri});
@@ -68,6 +71,34 @@ class AuthModel extends BaseModel {
    */
   getToken(){
     return this.store.token;
+  }
+
+  /**
+   * @description Returns true if logged in user would like to log out
+   * @param {Object} location - location object from AppStateStore
+   * @returns {Boolean}
+   */
+  logOutRequested(location){
+    if ( location?.path?.[0] === 'logout' ) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @description Clears server cache of user's access token
+   * @returns
+   */
+  async clearTokenServerCache(){
+    let state = this.store.serverCacheCleared;
+    try {
+      if ( state.state === 'loading' ){
+        await state.request
+      } else {
+        await this.service.clearTokenServerCache();
+      }
+    } catch(e) {}
+    return this.store.serverCacheCleared;
   }
 
   /**

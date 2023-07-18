@@ -39,6 +39,20 @@ class Cache {
     }
     return await pg.query(text, params);
   }
+
+  /**
+   * @description Delete a cached value
+   * @param {String} type - Arbitrary cache category type, e.g. 'accessToken'
+   * @param {String} query - Identifier for cache value of a category, e.g. 'user:1234'
+   * @returns
+   */
+  async delete(type, query){
+    let text = `
+      DELETE FROM cache
+      WHERE type = $1 AND query = $2
+    `;
+    return await pg.query(text, [type, query]);
+  }
 }
 
 export default new Cache();

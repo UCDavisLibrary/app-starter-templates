@@ -12,13 +12,17 @@ export default (app) => {
     <script src='/js/${config.env == 'dev' ? 'dev' : 'dist'}/${config.assetFileNames.js}?v=${config.version}'></script>
   `;
   const robots = config.discourageRobots ? `<meta name="robots" content="noindex, nofollow">`: '';
+  const routes = [...config.routes];
+  if ( config.auth.requireAuth ) {
+    routes.push('logout');
+  }
 
   // For config options, see https://github.com/UCDavisLibrary/spa-router-middleware
   spaMiddleware({
     app,
     htmlFile : path.join(assetsDir, 'index.html'),
     isRoot : true,
-    appRoutes : config.routes,
+    appRoutes : routes,
     static : {
       dir : assetsDir
     },
@@ -26,7 +30,7 @@ export default (app) => {
 
     getConfig : async (req, res, next) => {
       next({
-        routes : config.routes,
+        routes : routes,
         apiRoot : config.apiRoot,
         version: config.version,
         title: config.title,
