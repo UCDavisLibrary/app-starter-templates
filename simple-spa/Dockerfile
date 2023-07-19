@@ -25,9 +25,9 @@ WORKDIR /app/deploy-utils
 
 # Backup
 RUN mkdir data/backup
-#COPY backup /backup
-#COPY backup/cron /etc/cron.d/backup
-#RUN chmod 0644 /etc/cron.d/backup
+COPY deploy/utils/backup backup
+COPY deploy/utils/backup/cron /etc/cron.d/backup
+RUN chmod 0644 /etc/cron.d/backup
 
 # Init
 RUN mkdir data/init

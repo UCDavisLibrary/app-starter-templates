@@ -32,6 +32,7 @@ APP_CONTAINER_PORT=3000
 REPO_TAG=main
 
 # Dependency tags/branches
+# TODO: change these versions to match current LTS versions
 NODE_TAG=18
 POSTGRES_TAG=15.3
 ADMINER_TAG=4.8.1 # for local dev only
@@ -84,3 +85,7 @@ GC_READER_KEY_SECRET="" # name of secret in secret manager for reading from buck
 GC_WRITER_KEY_SECRET="" # name of secret in secret manager for writing to bucket
 GC_BACKUP_BUCKET="" # name of bucket that will be used for database backups
 BACKUP_FILE_NAME="db.sql.gz"
+# You may also need to set additional variables in your env file:
+# RUN_INIT/INIT_DATA_ENV - used to hydrate db on startup
+# RUN_BACKUP/BACKUP_DATA_ENV - used to backup db nightly
+# And, you will need to get a service account key with ./cmds/get-reader-key.sh or ./cmds/get-writer-key.sh
