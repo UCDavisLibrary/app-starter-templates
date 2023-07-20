@@ -24,7 +24,7 @@ services:
       GC_BACKUP_BUCKET: {{GC_BACKUP_BUCKET}}
       BACKUP_FILE_NAME: {{BACKUP_FILE_NAME}}
     volumes:
-      - ../../gc-reader-key.json:/etc/service-account.json
+      - ../gc-reader-key.json:/etc/service-account.json
     command: ./deploy-utils/init/init.sh
   backup:
     image: {{APP_IMAGE_NAME_TAG}}
@@ -37,7 +37,7 @@ services:
       GC_BACKUP_BUCKET: {{GC_BACKUP_BUCKET}}
       BACKUP_FILE_NAME: {{BACKUP_FILE_NAME}}
     volumes:
-      - ../../gc-writer-key.json:/etc/service-account.json
+      - ../gc-writer-key.json:/etc/service-account.json
     command: ./deploy-utils/backup/entrypoint.sh
   db:
     image: {{POSTGRES_IMAGE_NAME_TAG}}
