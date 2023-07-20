@@ -17,7 +17,7 @@ APP_VERSION=v0.0.9.${BUILD_NUM}
 
 # TODO: change to match name of your app
 # This will be used to name the container image among other things
-# So make it descriptive
+# So make it descriptive and unique
 APP_SLUG=simple-spa
 
 # App url and ports
