@@ -15,6 +15,16 @@ USER=$(gcloud auth list --filter="status:ACTIVE"  --format="value(account)")
 REPO_NAME=$(basename $(git remote get-url origin))
 BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
 
+if [[ -z $APP_IMAGE_NAME_TAG ]]; then
+  echo "APP_IMAGE_NAME_TAG variable is required."
+  exit 1
+fi
+
+if [[ -z $APP_SLUG ]]; then
+  echo "APP_SLUG variable is required."
+  exit 1
+fi
+
 echo "Submitting build to Google Cloud..."
 gcloud builds submit \
   --config ./deploy/gcloud/cloudbuild.yaml \
