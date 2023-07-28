@@ -16,6 +16,7 @@ To use this template when starting your own application:
 3. Search for `TODO:` in the project, and follow corresponding instructions
 4. Follow the Local Development section below to get your app up and running.
 5. Clean up your repository... replace this readme, delete todos, etc.
+6. When setting your production env file, make sure to include the [COMPOSE_PROJECT_NAME](https://docs.docker.com/compose/environment-variables/envvars/#compose_project_name) variable. Otherwise, your services will have generic names like `deploy-db-1`
 
 
 ## Directory Structure
