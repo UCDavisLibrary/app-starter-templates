@@ -1,12 +1,12 @@
 import pg from 'pg';
-const client = new pg.Pool();
+const pool = new pg.Pool();
 
 /**
  * @description Utility Wrapper around pg library
  */
 class Pg {
   constructor() {
-    this.client = client;
+    this.pool = pool;
   }
 
   get output(){
@@ -22,7 +22,7 @@ class Pg {
   async query(text, values){
     const out = this.output;
     try {
-      out.res = await client.query(text, values);
+      out.res = await pool.query(text, values);
     } catch (error) {
       out.error = error;
     }
