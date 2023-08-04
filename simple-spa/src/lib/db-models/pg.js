@@ -35,7 +35,7 @@ class Pg {
    * @returns {Object}
    */
   returnError(message){
-    const out = this.output;
+    const out = {...this.output};
     out.error = {};
     if ( message ) out.error.message = message;
     return out;
