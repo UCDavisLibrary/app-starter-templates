@@ -26,22 +26,23 @@ APP_VERSION=v0.0.9.${BUILD_NUM}
 REPO_TAG=sandbox
 
 # Dependency tags/branches
-THEME_TAG='v3.4.0'
+THEME_TAG='v3.5.0'
 WP_CORE_VERSION='6.3.0'
 MYSQL_TAG=5.7
 ADMINER_TAG=4
 
 # TODO: Your plugin versions go here.
 # Plugin versions (downloaded from Google Cloud Storage, so make sure they exist there. See Google Cloud section below)
-# and don't forget to add them as build arg in cmds/build.sh
+# and don't forget to add them as build arg in cmds/build.sh and the dockerfile.
 OPENID_CONNECT_GENERIC_VERSION='3.9.1'
 REDIRECTION_VERSION='5.3.10'
+SMTP_MAILER_VERSION='1.1.8'
 
 # TODO: Set up auth
 # Auth Defaults ( can also be overriden in .env file )
 OIDC_PROVIDER_URL='https://sandbox.auth.library.ucdavis.edu/realms/internal'
 # OIDC_PROVIDER_URL='https://auth.library.ucdavis.edu/realms/internal'
-OIDC_CLIENT_ID=''
+OIDC_CLIENT_ID=$APP_SLUG
 #OIDC_CLIENT_SECRET='set this in your .env file'
 OIDC_PROTOCOL_URL=$OIDC_PROVIDER_URL/protocol/openid-connect
 OIDC_ENDPOINT_LOGIN_URL=$OIDC_PROTOCOL_URL/auth
@@ -54,7 +55,7 @@ OIDC_LOGIN_TYPE='auto'
 OIDC_CREATE_IF_DOES_NOT_EXIST='true'
 OIDC_LINK_EXISTING_USERS='true'
 OIDC_REDIRECT_USER_BACK='true'
-OIDC_ENFORCE_PRIVACY='true' # if true, will protect all pages with login
+OIDC_ENFORCE_PRIVACY='false' # if true, will protect all pages with login
 
 ##
 # Repositories
@@ -88,6 +89,8 @@ if [[ ! -z $LOCAL_BUILD ]]; then
   CONTAINER_REG_ORG='localhost/local-dev'
 fi
 
+# This will be name of directory that contains local development docker compose file and env
+LOCAL_DEV_DIRECTORY=$APP_SLUG-local-dev
 
 # Container Images
 APP_IMAGE_NAME=$CONTAINER_REG_ORG/$APP_SLUG
@@ -120,6 +123,7 @@ WP_LOG_ROOT=/var/log/wordpress
 WP_THEME_DIR=$WP_SRC_ROOT/wp-content/themes
 WP_UCD_THEME_DIR=$WP_THEME_DIR/$THEME_REPO_NAME
 WP_PLUGIN_DIR=$WP_SRC_ROOT/wp-content/plugins
+WP_UPLOADS_DIR=$WP_SRC_ROOT/wp-content/uploads
 
 # Google Cloud
 # TODO: Set up Google Cloud buckets and service account keys

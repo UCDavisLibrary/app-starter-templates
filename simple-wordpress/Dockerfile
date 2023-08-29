@@ -2,6 +2,8 @@
 ARG WP_CORE_VERSION
 ARG REDIRECTION_VERSION
 ARG REDIRECTION_ZIP_FILE="redirection-${REDIRECTION_VERSION}.zip"
+ARG SMTP_MAILER_VERSION
+ARG SMTP_MAILER_ZIP_FILE="smtp-mailer-${SMTP_MAILER_VERSION}.zip"
 ARG OPENID_CONNECT_GENERIC_VERSION
 ARG OPENID_CONNECT_GENERIC_DIR="openid-connect-generic-${OPENID_CONNECT_GENERIC_VERSION}"
 ARG OPENID_CONNECT_GENERIC_ZIP_FILE="${OPENID_CONNECT_GENERIC_DIR}.zip"
@@ -13,10 +15,12 @@ WORKDIR /cache
 ARG GC_BUCKET_PLUGINS
 ARG REDIRECTION_ZIP_FILE
 ARG OPENID_CONNECT_GENERIC_ZIP_FILE
+ARG SMTP_MAILER_ZIP_FILE
 
 COPY deploy/gc-reader-key.json gc-reader-key.json
 RUN gcloud auth activate-service-account --key-file=./gc-reader-key.json \
 && gsutil cp gs://${GC_BUCKET_PLUGINS}/openid-connect-generic/${OPENID_CONNECT_GENERIC_ZIP_FILE} . \
+&& gsutil cp gs://${GC_BUCKET_PLUGINS}/smtp-mailer/${SMTP_MAILER_ZIP_FILE} . \
 && gsutil cp gs://${GC_BUCKET_PLUGINS}/redirection/${REDIRECTION_ZIP_FILE} .
 RUN rm gc-reader-key.json
 
@@ -34,14 +38,11 @@ ARG WP_SRC_ROOT
 ENV WP_SRC_ROOT=${WP_SRC_ROOT}
 ARG WP_LOG_ROOT
 ENV WP_LOG_ROOT=${WP_LOG_ROOT}
+ARG WP_UPLOADS_DIR
+ENV WP_UPLOADS_DIR=${WP_UPLOADS_DIR}
 ARG WP_THEME_DIR
 ARG WP_PLUGIN_DIR
 ARG THEME_TAG
-
-# Plugins
-ARG OPENID_CONNECT_GENERIC_DIR
-ARG OPENID_CONNECT_GENERIC_ZIP_FILE
-ARG REDIRECTION_ZIP_FILE
 
 WORKDIR $WP_SRC_ROOT
 
@@ -72,25 +73,35 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
 
 # get our prebuilt theme
 WORKDIR $WP_THEME_DIR
+RUN rm -rf */
 ARG THEME_FILE="ucdlib-theme-wp-${THEME_TAG}.tar.gz"
 RUN curl -OL https://github.com/UCDavisLibrary/ucdlib-theme-wp/releases/download/${THEME_TAG}/${THEME_FILE} \
 && tar -xzf ${THEME_FILE} \
 && rm ${THEME_FILE}
 
 # remove default plugins and insert the plugins we downloaded from GCS
+ARG OPENID_CONNECT_GENERIC_DIR
+ARG OPENID_CONNECT_GENERIC_ZIP_FILE
+ARG REDIRECTION_ZIP_FILE
+ARG SMTP_MAILER_ZIP_FILE
 WORKDIR $WP_PLUGIN_DIR
 RUN rm -rf */ && rm -f hello.php
 COPY src/plugins .
 COPY --from=gcloud /cache/${OPENID_CONNECT_GENERIC_ZIP_FILE} .
 COPY --from=gcloud /cache/${REDIRECTION_ZIP_FILE} .
+COPY --from=gcloud /cache/${SMTP_MAILER_ZIP_FILE} .
 RUN unzip ${OPENID_CONNECT_GENERIC_ZIP_FILE} && rm ${OPENID_CONNECT_GENERIC_ZIP_FILE} \
+&& unzip ${SMTP_MAILER_ZIP_FILE} && rm ${SMTP_MAILER_ZIP_FILE} \
 && unzip ${REDIRECTION_ZIP_FILE} && rm ${REDIRECTION_ZIP_FILE}
 RUN mv $OPENID_CONNECT_GENERIC_DIR openid-connect-generic
+
+# Copy our custom plugins
+COPY src/plugins/ucdlib-oidc ucdlib-oidc
 
 # Back to site root so wordpress can do the rest of its thing
 WORKDIR $WP_SRC_ROOT
 
-# override docker entry point
+# override docker entry point, so we can ensure apache can write to our volumes
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
