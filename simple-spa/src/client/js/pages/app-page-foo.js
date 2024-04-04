@@ -1,9 +1,11 @@
 import { LitElement } from 'lit';
 import { render } from "./app-page-foo.tpl.js";
 import { LitCorkUtils, Mixin } from "../../../lib/appGlobals.js";
+import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
+
 
 export default class AppPageFoo extends Mixin(LitElement)
-  .with(LitCorkUtils) {
+  .with(LitCorkUtils, MainDomElement) {
 
 
   static get properties() {
@@ -18,14 +20,6 @@ export default class AppPageFoo extends Mixin(LitElement)
     this.fooData = [];
 
     this._injectModel('AppStateModel', 'FooModel');
-  }
-
-  /**
-   * @description Disables the shadowdom
-   * @returns
-   */
-  createRenderRoot() {
-    return this;
   }
 
   /**

@@ -6,6 +6,7 @@ import '@ucd-lib/theme-elements/brand/ucd-theme-primary-nav/ucd-theme-primary-na
 import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-branding-bar/ucdlib-branding-bar.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
+import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 // icons
 import '@fortawesome/fontawesome-free/js/all.js';
@@ -40,7 +41,7 @@ import "./pages/app-page-alt-state.js";
  * @description The main app web component, which controls routing and other app-level functionality.
  */
 export default class AppMain extends Mixin(LitElement)
-  .with(LitCorkUtils) {
+  .with(LitCorkUtils, MainDomElement) {
 
   static get properties() {
     return {
@@ -91,14 +92,6 @@ export default class AppMain extends Mixin(LitElement)
     if ( props.has('page') ) {
       this.pageIsLoaded = this.page !== this._notLoadedPageId;
     }
-  }
-
-  /**
-   * @description Disables the shadowdom
-   * @returns
-   */
-  createRenderRoot() {
-    return this;
   }
 
   /**
