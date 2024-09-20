@@ -1,6 +1,6 @@
 import { LitElement } from 'lit';
 import { render } from "./app-page-home.tpl.js";
-import { LitCorkUtils, Mixin } from "../../../lib/appGlobals.js";
+import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 export default class AppPageHome extends Mixin(LitElement)
@@ -17,14 +17,6 @@ export default class AppPageHome extends Mixin(LitElement)
     this.render = render.bind(this);
 
     this._injectModel('AppStateModel');
-  }
-
-  /**
-   * @description Disables the shadowdom
-   * @returns
-   */
-  createRenderRoot() {
-    return this;
   }
 
   /**

@@ -12,10 +12,8 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import '@fortawesome/fontawesome-free/js/all.js';
 
 // global event bus and model registry
-import { Registry } from '@ucd-lib/cork-app-utils';
-
-// app globals - should be loaded after cork-app-utils
-import { appConfig, LitCorkUtils, Mixin } from "../../lib/appGlobals.js";
+import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+import { appConfig } from "../../lib/appGlobals.js";
 
 // init app state model
 import AppStateModel from "../../lib/cork/models/AppStateModel.js";

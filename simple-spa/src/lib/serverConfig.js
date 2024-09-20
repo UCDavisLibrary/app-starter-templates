@@ -38,7 +38,7 @@ class ServerConfig {
 
       // passed to the browser-side keycloak library initialization
       keycloakJsClient: {
-        url: this.getEnv('APP_KEYCLOAK_URL', 'https://sandbox.auth.library.ucdavis.edu'),
+        url: this.getEnv('APP_KEYCLOAK_URL', 'https://auth.library.ucdavis.edu'),
         realm: this.getEnv('APP_KEYCLOAK_REALM', 'internal'),
         clientId: this.getEnv('APP_KEYCLOAK_CLIENT_ID', 'simple-spa-client')
       },
