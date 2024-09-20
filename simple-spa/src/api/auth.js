@@ -41,16 +41,18 @@ export default (api) => {
       console.error('Unable to retrieve access token cache: ', cached.error);
     }
     if ( cached.res && cached.res.rowCount ) {
-      cached = cached.res.rows[0];
-      const cachedToken = cached.data.token;
-      const tokenExpiration = new Date(cachedToken.exp * 1000);
-      if ( tokenExpiration >= (new Date()).getTime() && cachedToken.jti === token.jti ) {
-        req.auth = {
-          token: new AccessToken(cached.data.token, clientId),
-          userInfo: cached.data.userInfo
+      cached = cached.res.rows.find(row => row.data?.token?.jti === token.jti);
+      if ( cached ) {
+        const cachedToken = cached.data.token;
+        const tokenExpiration = new Date(cachedToken.exp * 1000);
+        if ( tokenExpiration >= (new Date()).getTime() && cachedToken.jti === token.jti ) {
+          req.auth = {
+            token: new AccessToken(cached.data.token, clientId),
+            userInfo: cached.data.userInfo
+          }
+          next();
+          return;
         }
-        next();
-        return;
       }
     }
 
@@ -77,7 +79,7 @@ export default (api) => {
       });
       return;
     }
-    const setCache = await cache.set('accessToken', token.preferred_username, {token: token, userInfo});
+    const setCache = await cache.set('accessToken', token.preferred_username, {token: token, userInfo}, config.auth.serverCacheLruSize);
     if ( setCache.error ) {
       console.error('Unable to set access token cache: ', setCache.error);
     }

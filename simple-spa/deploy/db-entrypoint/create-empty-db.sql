@@ -5,8 +5,7 @@ CREATE TABLE cache (
     type varchar(100),
     query text NOT NULL,
     data jsonb,
-    created timestamp DEFAULT NOW(),
-    UNIQUE (type, query)
+    created timestamp DEFAULT NOW()
 );
 
 -- TODO: Add your tables and schema stuff here

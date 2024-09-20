@@ -9,7 +9,11 @@ class Pg {
     this.pool = pool;
   }
 
-  get output(){
+  /**
+   * @description Default output object template for query results
+   * @returns {Object} {res, error}
+   */
+  output(){
     return {res: false, error: false};
   }
 
@@ -20,7 +24,7 @@ class Pg {
    * @returns {Object} {res, err}
    */
   async query(text, values){
-    const out = this.output;
+    const out = this.output();
     try {
       out.res = await pool.query(text, values);
     } catch (error) {
@@ -35,7 +39,7 @@ class Pg {
    * @returns {Object}
    */
   returnError(message){
-    const out = {...this.output};
+    const out = this.output();
     out.error = {};
     if ( message ) out.error.message = message;
     return out;

@@ -43,7 +43,8 @@ class ServerConfig {
         clientId: this.getEnv('APP_KEYCLOAK_CLIENT_ID', 'simple-spa-client')
       },
       oidcScope: this.getEnv('APP_OIDC_SCOPE', 'profile roles ucd-ids'),
-      serverCacheExpiration: this.getEnv('APP_SERVER_CACHE_EXPIRATION', '10 minutes')
+      serverCacheExpiration: this.getEnv('APP_SERVER_CACHE_EXPIRATION', '10 minutes'),
+      serverCacheLruSize: this.getEnv('APP_SERVER_CACHE_LRU_SIZE', 5)
     };
   }
 
