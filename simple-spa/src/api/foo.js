@@ -1,5 +1,6 @@
 import foo from "../lib/db-models/foo.js";
 import protect from "../lib/protect.js";
+import nodeLogger from "../lib/utils/nodeLogger.js";
 
 /**
  * @param {Router} api - Express router instance
@@ -10,16 +11,13 @@ export default (api) => {
 
     let response = await foo.getAll();
     if ( response.error ) {
-      console.error('Error retrieving foo: ', response.error);
-      res.status(500).json({
+      nodeLogger.serverError(req, response.error);
+      return res.status(500).json({
         error: true,
         message: 'Error retrieving foo'
       });
-      return;
     }
-
-    res.json(response.res.rows);
-
+    res.json(response);
   });
 
 }

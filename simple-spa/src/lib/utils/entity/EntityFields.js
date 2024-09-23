@@ -1,13 +1,18 @@
 import Validator from './Validator.js';
+
 /**
  * @class EntityFields
  * @description Used to define fields of an entity (usually a database table) and perform validations
  * @param {Array} fields - array of field objects with the following properties:
  * - dbName {String} REQUIRED - name of the field in the database (should be snake_case)
  * - jsonName {String} OPTIONAL - name of the field in JSON responses (will default to camelCase of dbName)
- * - required {Boolean} OPTIONAL - if the field is required
- * - charLimit {Number} OPTIONAL - maximum number of characters allowed
- * - customValidation {Function} OPTIONAL - custom validation function
+ * - validation {Object} OPTIONAL - object with validation options including:
+ *  - required {Boolean} OPTIONAL - whether the field is required
+ *  - charLimit {Number} OPTIONAL - maximum number of characters allowed
+ *  - type {String} OPTIONAL - type of the field (e.g. 'string', 'number', 'boolean')
+ *  - custom {Function} OPTIONAL - custom validation function or object with properties:
+ *   - fn {Function} REQUIRED - custom validation function that accepts field, value, and validator class as arguments
+ *   - position {String} OPTIONAL - 'after' to run after all other validations
  */
 export default class EntityFields {
   constructor(fields = [], kwargs={}) {
@@ -16,8 +21,21 @@ export default class EntityFields {
     this.jsonBuildObjectTable = kwargs.jsonBuildObjectTable || '';
   }
 
-  async validate(data, kwargs={}){
-    const validator = new Validator(this, kwargs);
+  /**
+   * @description Validate data based on entity fields
+   * @param {Object} data - entity data to validate
+   * @param {Object} kwargs - additional optional arguments to pass to the validator
+   * @returns {Object} - object with valid (Boolean) and fieldsWithErrors (Array) properties
+   */
+  async validate(data, kwargs){
+    const validator = new Validator(this, data, kwargs);
+    await validator.validate();
+
+    if ( kwargs?.returnValidator ) return validator;
+    return {
+      valid: validator.valid,
+      fieldsWithErrors: validator.fieldsWithErrors
+    };
   }
 
   /**

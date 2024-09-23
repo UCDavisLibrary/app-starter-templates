@@ -15,14 +15,14 @@ class FooModel extends BaseModel {
 
   async getFoo(){
     let state = this.store.data.foo;
-    try {
-      if ( state.state === 'loading' ){
-        await state.request
-      } else {
-        await this.service.getFoo();
-      }
-    } catch(e) {}
-    return this.store.data.foo;
+    if ( state.state === 'loading' ){
+      await state.request
+    } else {
+      await this.service.getFoo();
+    }
+    state = this.store.data.foo;
+    this.store.emit(this.store.events.FOO_REQUESTED, state);
+    return state;
   }
 
 }

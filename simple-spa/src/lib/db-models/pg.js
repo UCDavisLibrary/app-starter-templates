@@ -74,6 +74,10 @@ class Pg {
     return this._toEqualsClause(queryObject, ', ');
   }
 
+  prepareObjectForUpdate(obj){
+    return this.toUpdateClause(obj);
+  }
+
   /**
    * @description Converts an object to parameters of an INSERT clause
    * @param {Object} obj - key value pairs for clause

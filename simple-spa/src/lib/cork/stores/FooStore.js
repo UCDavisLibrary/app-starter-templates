@@ -9,7 +9,8 @@ class FooStore extends BaseStore {
       foo: {}
     };
     this.events = {
-      FOO_FETCHED: 'foo-fetched'
+      FOO_FETCHED: 'foo-fetched',
+      FOO_REQUESTED: 'foo-requested'
     };
   }
 
