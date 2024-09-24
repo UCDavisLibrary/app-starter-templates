@@ -30,7 +30,7 @@ return html`
 
   <!-- TODO: Replace these with your own pages -->
   <ucdlib-pages id='main-pages' selected=${this.page}>
-    <app-page-alt-state id=${this._notLoadedPageId} .state=${this.pageState} .errorMessage=${this.errorMessage}></app-page-alt-state>
+    <app-page-alt-state id=${this._notLoadedPageId}></app-page-alt-state>
     <app-page-home id='home'></app-page-home>
     <app-page-foo id='foo'></app-page-foo>
   </ucdlib-pages>

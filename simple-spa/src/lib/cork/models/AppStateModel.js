@@ -156,23 +156,56 @@ class AppStateModelImpl extends AppStateModel {
    * @description Show the app's error page
    * @param {String|Object} msg Error message to show or cork-app-utils response object
    */
-  showError(msg=''){
-    let errorMessage = ''
-    if ( typeof msg === 'object' ) {
-      console.error(msg);
-      if ( msg?.error?.response?.status == 404 ){
-        errorMessage = 'Page not found';
-      } else if ( msg?.error?.response?.status == 401 ){
-        errorMessage = 'You need to authenticate to view this page';
-      } else if ( msg?.error?.response?.status == 403 ){
-        errorMessage = 'You are not authorized to view this page';
-      }else if ( msg?.error?.message ) {
-        errorMessage = msg?.error?.message;
+  showError(errorMessage, errorHeading){
+    this.store.emit('page-state-update', {state: 'error', errorMessage, errorHeading});
+  }
+
+  /**
+   * @description Checks if there is an error in an array of cork-app-utils service response objects
+   * Displays error page if found
+   * Should be used in a page's _onAppStateUpdate method. e.g.
+   * async _onAppStateUpdate(state) {
+   *   this.AppStateModel.showLoading();
+   *   const d = await this.getPageData();
+   *   if ( this.AppStateModel.showMessageIfServiceError(d) ) return;
+   *   this.AppStateModel.showLoaded(this.id);
+   * }
+   * @param {Array} responseArray Array of cork-app-utils service response objects from a Promise.allSettled call
+   */
+  showMessageIfServiceError(responseArray){
+
+    // handle a single cork-app-utils response object
+    if ( !Array.isArray(responseArray) ) responseArray = [{value: responseArray}];
+
+    // flatten array of responses
+    // e.g. if one of the array elements is also an array from a Promise.allSettled call
+    responseArray = responseArray.reduce((acc, val) => {
+      if ( Array.isArray(val?.value) ){
+        acc.push(...val.value);
+      } else {
+        acc.push(val);
       }
-    } else {
-      errorMessage = msg;
+      return acc;
+    }, []);
+
+    const errors = responseArray.filter(r => r.value.state === 'error').map(r => r.value);
+    if ( !errors.length ) return false;
+
+    console.log(errors);
+
+
+    const standardResponses = [
+      [404, 'Page not found'],
+      [401, 'You need to authenticate to view this page'],
+      [403, 'You are not authorized to view this page']
+    ];
+    for ( const sr of standardResponses ) {
+      if ( errors.find(e => e?.error?.response?.status === sr[0]) ){
+        this.showError(sr[1]);
+        return true;
+      }
     }
-    this.store.emit('page-state-update', {state: 'error', errorMessage});
+
   }
 
   /**

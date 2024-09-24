@@ -1,4 +1,4 @@
-import {BaseStore} from '@ucd-lib/cork-app-utils';
+import {BaseStore, LruStore} from '@ucd-lib/cork-app-utils';
 
 class FooStore extends BaseStore {
 
@@ -6,38 +6,10 @@ class FooStore extends BaseStore {
     super();
 
     this.data = {
-      foo: {}
+      list: new LruStore({name: 'foo.list', max: 1})
     };
-    this.events = {
-      FOO_FETCHED: 'foo-fetched',
-      FOO_REQUESTED: 'foo-requested'
-    };
-  }
 
-  getFooLoading(request) {
-    this._setFooState({
-      state : this.STATE.LOADING,
-      request
-    });
-  }
-
-  getFooLoaded(payload) {
-    this._setFooState({
-      state : this.STATE.LOADED,
-      payload
-    });
-  }
-
-  getFooError(error) {
-    this._setFooState({
-      state : this.STATE.ERROR,
-      error
-    });
-  }
-
-  _setFooState(state) {
-    this.data.foo = state;
-    this.emit(this.events.FOO_FETCHED, state);
+    this.events = {};
   }
 
 }

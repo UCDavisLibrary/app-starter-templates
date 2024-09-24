@@ -50,9 +50,7 @@ export default class AppMain extends Mixin(LitElement)
       showBreadcrumbs: {type: Boolean},
       userIsAuthenticated: {type: Boolean},
       appTitle: {type: String},
-      pageIsLoaded: {state: true},
-      pageState: {state: true},
-      errorMessage: {state: true}
+      pageIsLoaded: {state: true}
     }
   }
 
@@ -144,11 +142,7 @@ export default class AppMain extends Mixin(LitElement)
    */
   _onPageStateUpdate(e) {
     const { state } = e;
-    this.pageState = state;
-    if ( state === 'error' ) {
-      this.errorMessage = e.errorMessage;
-    }
-    this.page = e.state === 'loaded' ? e.page : this._notLoadedPageId;
+    this.page = state === 'loaded' ? e.page : this._notLoadedPageId;
   }
 
   /**

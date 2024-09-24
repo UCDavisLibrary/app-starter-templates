@@ -39,8 +39,9 @@ export default class AppPageFoo extends Mixin(LitElement)
     this.AppStateModel.setBreadcrumbs(breadcrumbs);
 
     const d = await this.getPageData();
-    const hasError = d.some(e => e.state === 'error');
-    if ( !hasError ) this.AppStateModel.showLoaded(this.id);
+
+    if ( this.AppStateModel.showMessageIfServiceError(d) ) return;
+    this.AppStateModel.showLoaded(this.id);
 
   }
 
@@ -48,18 +49,15 @@ export default class AppPageFoo extends Mixin(LitElement)
    * @description Get any data required for rendering this page
    */
   async getPageData(){
-    const promises = [];
-    promises.push(this.FooModel.getFoo());
-    const resolvedPromises = await Promise.all(promises);
-    return resolvedPromises;
+    const promises = [
+      this.FooModel.list()
+    ];
+    return Promise.allSettled(promises);
   }
 
-  _onFooFetched(e) {
+  _onFooListUpdate(e) {
     if ( e.state === 'loaded' ) {
       this.fooData = e.payload;
-    } else if ( e.state === 'error' ) {
-      this.fooData = [];
-      this.AppStateModel.showError(e);
     }
   }
 

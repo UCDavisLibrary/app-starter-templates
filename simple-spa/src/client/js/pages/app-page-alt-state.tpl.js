@@ -39,7 +39,10 @@ export function styles() {
       max-width: 150px;
     }
     .logo-error {
-      color: #c10230;
+      color: #13639e;
+      width: 5%;
+      min-width: 30px;
+      max-width: 50px;
     }
     .lib-logo {
       transform: scale(2.0);
@@ -54,8 +57,20 @@ export function styles() {
     .text {
       margin-top: .5rem;
     }
+    .main.error {
+      margin-top: 4rem;
+    }
     .error .text {
       text-align: center;
+      margin-top: 0;
+    }
+    .error-heading {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .error-message {
+      font-size: 1rem;
+      color: rgb(91, 91, 91);
     }
 
     @keyframes swell {
@@ -118,8 +133,11 @@ export function render() {
     </div>
     <div class='error main' ?hidden=${this.state != 'error'}>
       <div class='logo logo-error'>${renderErrorLogo()}</div>
-      <h1 class='text heading--highlight'> An ${this.errorMessage ? '' : 'unknown'} error has occurred!</h1>
-      <h1 class='text heading--highlight' .hidden=${this.errorMessage ? false : true}>${this.errorMessage}</h1>
+      <div class='text'>
+        <div class='error-heading'>${this.errorHeading}</div>
+        <div class='error-message' .hidden=${this.errorMessage ? false : true}>${this.errorMessage}</div>
+      </div>
+
     </div>
   </div>
 
