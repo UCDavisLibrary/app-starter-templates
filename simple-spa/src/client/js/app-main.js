@@ -9,7 +9,8 @@ import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
 // icons
-import '@fortawesome/fontawesome-free/js/all.js';
+// if your bundle build is failing here, you need to run deploy/cmds/subset-icons.sh
+import '@fortawesome/fontawesome-free/js/ucdlib-custom.js';
 
 // global event bus and model registry
 import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
