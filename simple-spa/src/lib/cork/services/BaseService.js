@@ -1,7 +1,5 @@
-import { BaseService } from '@ucd-lib/cork-app-utils';
+import { BaseService, getLogger } from '@ucd-lib/cork-app-utils';
 import { appConfig } from '../../appGlobals.js';
-
-// TODO: If not using auth, you can remove this file
 
 /**
  * @class BaseServiceImp
@@ -29,5 +27,37 @@ export default class BaseServiceImp extends BaseService {
       } catch (error) {}
     }
     return await super.request(options);
+  }
+
+  /**
+   * @description Log if 500+ error. Will report to google cloud if APP_REPORT_ERRORS_ENABLED=true
+   * @param {*} options
+   * @param {*} resolve
+   * @param {*} error
+   */
+  async _handleError(options, resolve, error) {
+    await super._handleError(options, resolve, error);
+    if ( error?.response?.status >= 500) {
+      const e = {
+        type: 'cork-service.server-error',
+        payload: error?.payload,
+        url: options.url,
+      }
+      if ( options.json && options?.fetchOptions?.body ){
+        e.requestBody = JSON.parse(options.fetchOptions.body);
+      }
+      this.logger.error(e);
+    }
+  }
+
+  _initLogger(name) {
+    if( this._logger ) return;
+    if (!name) name = this.constructor.name;
+    this._logger = getLogger(name);
+  }
+
+  get logger() {
+    this._initLogger();
+    return this._logger;
   }
 }

@@ -6,10 +6,16 @@ services:
       - .env
     ports:
       - ${APP_HOST_PORT:-{{APP_HOST_PORT}}}:${APP_CONTAINER_PORT:-{{APP_CONTAINER_PORT}}}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
     depends_on:
       - db
     environment:
       APP_ENV: ${APP_ENV:-dev}
+      APP_SERVER_LOG_FORMAT: ${APP_SERVER_LOG_FORMAT:-inspect}
       PGUSER: 'postgres'
       PGHOST: 'db'
       PGDATABASE: 'postgres'

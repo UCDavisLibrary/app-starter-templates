@@ -72,6 +72,14 @@ export function styles() {
       font-size: 1rem;
       color: rgb(91, 91, 91);
     }
+    .error-log-id {
+      margin-top: 1rem;
+      font-size: .875rem;
+      color: rgb(91, 91, 91);
+    }
+    .error-log-id .error-log-id__id {
+      color: #13639e;
+    }
 
     @keyframes swell {
       0% {
@@ -136,6 +144,10 @@ export function render() {
       <div class='text'>
         <div class='error-heading'>${this.errorHeading}</div>
         <div class='error-message' .hidden=${this.errorMessage ? false : true}>${this.errorMessage}</div>
+        <div class='error-log-id' .hidden=${!this.serverLogId}>
+          <div>Please reference the following error ID when submitting a technical assistance ticket:</div>
+          <div class='error-log-id__id'>${this.serverLogId}</div>
+        </div>
       </div>
 
     </div>

@@ -19,6 +19,7 @@ export default class AppPageAltState extends Mixin(LitElement)
       state: {type: String},
       errorHeading: {type: String},
       errorMessage: {type: String},
+      serverLogId: {type: String},
       isVisible: {state: true}
     }
   }
@@ -33,6 +34,7 @@ export default class AppPageAltState extends Mixin(LitElement)
     this.state = 'loading';
     this.errorHeading = 'An Error Occurred';
     this.errorMessage = '';
+    this.serverLogId = '';
 
     this.isVisible = false;
     new MutationObserverController(this, {attributes : true, attributeFilter : ['style']});
@@ -51,6 +53,7 @@ export default class AppPageAltState extends Mixin(LitElement)
     if ( this.state === 'error' ) {
       this.errorHeading = e.errorHeading || 'An Error Occurred';
       this.errorMessage = e.errorMessage || '';
+      this.serverLogId = e.serverLogId || '';
     }
   }
 

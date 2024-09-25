@@ -34,7 +34,7 @@ class Foo extends BaseModel {
       SELECT * FROM foo
     `;
     const r = await pg.query(text);
-    if ( r.error ) return { error: r };
+    if ( r.error ) return this.formatError(r.error);
 
     return this.entityFields.toJsonArray(r.res.rows);
   }
@@ -44,7 +44,7 @@ class Foo extends BaseModel {
     delete data.id;
     const validation = await this.entityFields.validate(data, { excludeFields: ['id'] });
     if ( !validation.valid ) {
-      return this.returnValidationError(validation);
+      return this.formatValidationError(validation);
     }
     const i = pg.prepareObjectForInsert(data);
     const sql = `
@@ -53,7 +53,7 @@ class Foo extends BaseModel {
       RETURNING id
     `
     const r = await pg.query(sql, i.values);
-    if ( r.error ) return this.returnError(r.error);
+    if ( r.error ) return this.formatError(r.error);
 
     return { id: r.res.rows[0].id, success: true };
   }
@@ -73,7 +73,7 @@ class Foo extends BaseModel {
       WHERE id = $${update.values.length + 1}
     `;
     const r = await pg.query(sql, update.values);
-    if ( r.error ) return this.returnError(r.error);
+    if ( r.error ) return this.formatError(r.error);
 
     return { success: true };
   }

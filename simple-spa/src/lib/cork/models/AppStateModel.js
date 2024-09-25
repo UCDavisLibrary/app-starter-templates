@@ -154,10 +154,12 @@ class AppStateModelImpl extends AppStateModel {
 
   /**
    * @description Show the app's error page
-   * @param {String|Object} msg Error message to show or cork-app-utils response object
+   * @param {String} errorMessage - Optional. The error message to display.
+   * @param {String} errorHeading - Optional. The error heading to display.
+   * @param {String} serverLogId - Optional. The server log id to display.
    */
-  showError(errorMessage, errorHeading){
-    this.store.emit('page-state-update', {state: 'error', errorMessage, errorHeading});
+  showError(errorMessage, errorHeading, serverLogId){
+    this.store.emit('page-state-update', {state: 'error', errorMessage, errorHeading, serverLogId});
   }
 
   /**
@@ -188,12 +190,11 @@ class AppStateModelImpl extends AppStateModel {
       return acc;
     }, []);
 
+    // extract errors from responses
     const errors = responseArray.filter(r => r.value.state === 'error').map(r => r.value);
     if ( !errors.length ) return false;
 
-    console.log(errors);
-
-
+    // handle standard responses
     const standardResponses = [
       [404, 'Page not found'],
       [401, 'You need to authenticate to view this page'],
@@ -205,6 +206,21 @@ class AppStateModelImpl extends AppStateModel {
         return true;
       }
     }
+
+    // look for a meaningful error message
+    // as formatted by apiUtils.return500IfDbError server method
+    const meaningfulError = errors.find(e => e?.error?.payload?.errorMessage || e?.error?.payload?.errorHeading);
+    if ( meaningfulError ){
+      this.showError(
+        meaningfulError.error.payload.errorMessage,
+        meaningfulError.error.payload.errorHeading,
+        meaningfulError.error.payload.serverLogId
+      );
+      return true;
+    }
+
+    this.showError();
+    return true;
 
   }
 

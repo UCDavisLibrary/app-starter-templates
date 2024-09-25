@@ -6,8 +6,15 @@ services:
       - .env
     ports:
       - ${APP_HOST_PORT:-{{APP_HOST_PORT}}}:${APP_CONTAINER_PORT:-{{APP_CONTAINER_PORT}}}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
     depends_on:
       - db
+    environment:
+      APP_SERVER_LOG_FORMAT: ${APP_SERVER_LOG_FORMAT:-json}
     restart: always
     command: ./start-server.sh
   init:
@@ -35,6 +42,7 @@ services:
       BACKUP_FILE_NAME: {{BACKUP_FILE_NAME}}
     volumes:
       - ../gc-writer-key.json:/etc/service-account.json
+    restart: always
     command: ./deploy-utils/backup/entrypoint.sh
   db:
     image: {{POSTGRES_IMAGE_NAME_TAG}}

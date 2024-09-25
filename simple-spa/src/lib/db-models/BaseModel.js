@@ -8,7 +8,7 @@ export default class BaseModel {
    * @param {Object} v - object returned by validation method
    * @returns {Object}
    */
-  returnValidationError(v){
+  formatValidationError(v){
     const error = new Error('Validation error');
     return {
       ...v,
@@ -19,10 +19,10 @@ export default class BaseModel {
 
   /**
    * @description Object to return by database model when a generic error occurs (probably a 500)
-   * @param {*} error
+   * @param {String|Object} error - String or Error object - usually will be r.error from a db query
    * @returns {Object}
    */
-  returnError(error){
+  formatError(error){
     if ( typeof error === 'string'){
       error = new Error(error);
     }
