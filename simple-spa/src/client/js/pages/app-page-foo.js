@@ -1,4 +1,4 @@
-import { LitElement } from 'lit';
+import { LitElement, html } from 'lit';
 import { render } from "./app-page-foo.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
@@ -58,6 +58,29 @@ export default class AppPageFoo extends Mixin(LitElement)
   _onFooListUpdate(e) {
     if ( e.state === 'loaded' ) {
       this.fooData = e.payload;
+    }
+  }
+
+  _onEditClick(item){}
+
+  _onDeleteClick(item){
+    this.AppStateModel.showDialogModal({
+      title: 'Delete Foo',
+      content: html`
+        <p>Are you sure you want to delete foo item: <strong>${item.name}</strong>?</p>
+        <p>This action cannot be undone.</p>
+        `,
+      actions: [
+        {text: 'Delete', value: 'delete-foo', color: 'double-decker'},
+        {text: 'Cancel', value: 'cancel'}
+      ],
+      data: {item}
+    });
+  }
+
+  _onAppDialogAction(e){
+    if( e.action === 'delete-foo' ) {
+      console.log('Delete foo item', e.data.item);
     }
   }
 

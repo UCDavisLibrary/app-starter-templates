@@ -7,11 +7,29 @@ return html`
       <div class="l-content">
         <p>Here is a list of foo retrieved from the database/api using a cork-app-utils model:</p>
         ${this.fooData.length ? html`
-          <ul>
+          <div>
             ${this.fooData.map(item => html`
-              <li>${item.name}</li>
+              <div class='flex flex--align-center u-space-my--small'>
+                <div style='font-size:.7rem;'>
+                  <a
+                    title='Edit'
+                    @click=${() => this._onEditClick(item)}
+                    class='icon-link icon-link--circle'>
+                    <i class="fa-solid fa-pen"></i>
+                  </a>
+                </div>
+                <div style='font-size:.7rem;'>
+                  <a
+                    title='Delete'
+                    @click=${() => this._onDeleteClick(item)}
+                    class='icon-link icon-link--circle u-space-mx--small category-brand--double-decker'>
+                    <i class="fa-solid fa-xmark"></i>
+                  </a>
+                </div>
+                <div>${item.name}</div>
+              </div>
             `)}
-          </ul>
+        </div>
         ` : html`
           <p>There is no foo to display</p>
         `}

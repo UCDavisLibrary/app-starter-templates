@@ -260,6 +260,37 @@ class AppStateModelImpl extends AppStateModel {
     return update?.location?.path?.[index];
   }
 
+  /**
+   * @description Show a modal dialog box.
+   * To listen for the action event, add the _onDialogAction method to your element and then filter on e.action
+   * @param {Object} options Dialog object with the following properties:
+   * - title {TemplateResult} - The title of the dialog (optional)
+   * - content {TemplateResult} - The html content of the dialog (optional, but should probably be included)
+   * - actions {Array} - Array of objects with the following properties:
+   *  - text {String} - The text of the button
+   *  - value {String} - The action slug that is emitted when button is clicked
+   *  - invert {Boolean} - Invert the button color (optional)
+   *  - color {String} - The brand color string of the button (optional)
+   * - data {Object} - Any data to pass along in the action event (optional)
+   *
+   * If the actions array is empty, a 'Dismiss' button will be added automatically
+   */
+  showDialogModal(options={}){
+    if ( !options.actions ) {
+      options.actions = [{text: 'Dismiss', action: 'dismiss'}];
+    }
+    if ( !options.data ) {
+      options.data = {};
+    }
+    if ( !options.title ) {
+      options.title = '';
+    }
+    if ( !options.content ) {
+      options.content = '';
+    }
+    this.store.emit('app-dialog-open', options);
+  }
+
 }
 
 const model = new AppStateModelImpl();

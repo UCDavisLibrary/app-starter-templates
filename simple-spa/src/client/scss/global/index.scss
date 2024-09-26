@@ -1,0 +1,10 @@
+@use './form.scss' as form;
+@use './icon.scss' as icon;
+@use './layout.scss' as layout;
+
+[hidden] {
+  display: none !important;
+}
+.pointer {
+  cursor: pointer;
+}

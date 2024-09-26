@@ -35,6 +35,9 @@ Registry.ready();
 import bundles from "./pages/bundles/index.js";
 import "./pages/app-page-alt-state.js";
 
+// global app components
+import './components/app-dialog-modal.js';
+
 /**
  * @class AppMain
  * @description The main app web component, which controls routing and other app-level functionality.

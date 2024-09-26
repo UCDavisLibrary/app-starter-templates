@@ -20,6 +20,8 @@ class AppStateStoreImpl extends AppStateStore {
     this.events.PAGE_TITLE_UPDATE = 'page-title-update';
     this.events.BREADCRUMB_UPDATE = 'breadcrumb-update';
     this.events.ALERT_BANNER_UPDATE = 'alert-banner-update';
+    this.events.APP_DIALOG_OPEN = 'app-dialog-open';
+    this.events.APP_DIALOG_ACTION = 'app-dialog-action';
   }
 }
 
