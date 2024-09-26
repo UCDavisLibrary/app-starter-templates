@@ -1,10 +1,10 @@
 import { LitElement } from 'lit';
 import { render } from "./app-page-home.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
-import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
+import AppPageElement from '../mixins/AppPageElement.js';
 
 export default class AppPageHome extends Mixin(LitElement)
-  .with(LitCorkUtils, MainDomElement) {
+  .with(LitCorkUtils, AppPageElement) {
 
   static get properties() {
     return {
@@ -24,7 +24,7 @@ export default class AppPageHome extends Mixin(LitElement)
    * @param {Object} state - AppStateModel state
    */
   async _onAppStateUpdate(state) {
-    if ( this.id !== state.page ) return;
+    if ( this.pageId !== state.page ) return;
     // this.AppStateModel.showLoading();
 
     this.AppStateModel.setTitle('Home Page');

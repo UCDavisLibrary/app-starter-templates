@@ -58,7 +58,6 @@ export default class AppDialogModal extends Mixin(LitElement)
     this.dialogRef.value.close();
     this.logger.info(`Dialog action: ${action}`, this.data, `use callback: _onAppDialogAction`);
     this.AppStateModel.emit('app-dialog-action', {action, data: this.data});
-
   }
 
 }

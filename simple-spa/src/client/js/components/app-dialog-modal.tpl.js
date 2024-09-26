@@ -1,5 +1,4 @@
 import { html } from 'lit';
-//import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { ref } from 'lit/directives/ref.js';
 
 export function render() {

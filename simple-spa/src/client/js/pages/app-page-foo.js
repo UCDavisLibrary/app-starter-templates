@@ -1,11 +1,11 @@
 import { LitElement, html } from 'lit';
 import { render } from "./app-page-foo.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
-import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
+import AppPageElement from '../mixins/AppPageElement.js';
 
 
 export default class AppPageFoo extends Mixin(LitElement)
-  .with(LitCorkUtils, MainDomElement) {
+  .with(LitCorkUtils, AppPageElement) {
 
 
   static get properties() {
@@ -27,7 +27,7 @@ export default class AppPageFoo extends Mixin(LitElement)
    * @param {Object} state - AppStateModel state
    */
   async _onAppStateUpdate(state) {
-    if ( this.id !== state.page ) return;
+    if ( this.pageId !== state.page ) return;
 
     this.AppStateModel.showLoading();
     this.AppStateModel.setTitle('Foo');
@@ -41,7 +41,7 @@ export default class AppPageFoo extends Mixin(LitElement)
     const d = await this.getPageData();
 
     if ( this.AppStateModel.showMessageIfServiceError(d) ) return;
-    this.AppStateModel.showLoaded(this.id);
+    this.AppStateModel.showLoaded(this.pageId);
 
   }
 

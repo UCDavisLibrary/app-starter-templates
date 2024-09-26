@@ -29,10 +29,10 @@ return html`
   </ol>
 
   <!-- TODO: Replace these with your own pages -->
-  <ucdlib-pages id='main-pages' selected=${this.page}>
-    <app-page-alt-state id=${this._notLoadedPageId}></app-page-alt-state>
-    <app-page-home id='home'></app-page-home>
-    <app-page-foo id='foo'></app-page-foo>
+  <ucdlib-pages id='main-pages' attr-for-selected='page-id' selected=${this.page}>
+    <app-page-alt-state page-id=${this._notLoadedPageId}></app-page-alt-state>
+    <app-page-home page-id='home'></app-page-home>
+    <app-page-foo page-id='foo'></app-page-foo>
   </ucdlib-pages>
   <app-dialog-modal></app-dialog-modal>
 
