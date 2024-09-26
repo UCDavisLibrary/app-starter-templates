@@ -10,7 +10,7 @@ services:
       driver: "json-file"
       options:
         max-size: "20m"
-        max-file: "1"
+        max-file: "2"
     depends_on:
       - db
     environment:

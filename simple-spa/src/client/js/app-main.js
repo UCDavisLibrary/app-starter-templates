@@ -13,7 +13,7 @@ import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-el
 import '@fortawesome/fontawesome-free/js/ucdlib-custom.js';
 
 // global event bus and model registry
-import { Registry, LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
+import { Registry, LitCorkUtils, Mixin, getLogger } from '@ucd-lib/cork-app-utils';
 import { appConfig } from "../../lib/appGlobals.js";
 
 // init app state model
@@ -37,6 +37,10 @@ import "./pages/app-page-alt-state.js";
 
 // global app components
 import './components/app-dialog-modal.js';
+
+// initialize route logger
+import appRoutes from '../../lib/utils/appRoutes.js';
+appRoutes.logger = getLogger('appRoutes');
 
 /**
  * @class AppMain

@@ -30,13 +30,8 @@ export default class AppPageFoo extends Mixin(LitElement)
     if ( this.pageId !== state.page ) return;
 
     this.AppStateModel.showLoading();
-    this.AppStateModel.setTitle('Foo');
-
-    const breadcrumbs = [
-      this.AppStateModel.store.breadcrumbs.home,
-      this.AppStateModel.store.breadcrumbs.foo
-    ];
-    this.AppStateModel.setBreadcrumbs(breadcrumbs);
+    this.showPageTitle();
+    this.showBreadcrumbs();
 
     const d = await this.getPageData();
 

@@ -1,4 +1,5 @@
 import nodeLogger from "./utils/nodeLogger.js";
+import appRoutes from "./utils/appRoutes.js";
 
 /**
  * @description Server configuration file. Reads environment variables and sets defaults.
@@ -14,7 +15,12 @@ class ServerConfig {
     this.title = this.getEnv('APP_TITLE', 'UC Davis Library Simple SPA');
 
     // TODO: Replace these with the routes that your SPA should handle
-    this.routes = ['foo'];
+    appRoutes.routes = [
+      {pageId: 'home', pageTitle: 'Home', isHome: true, breadcrumbText: 'Home', pathSegment: '', parent: null},
+      {pageId: 'foo', pageTitle: 'Fooz', breadcrumbText: 'Foo', pathSegment: 'foo', parent: null}
+    ];
+    this.routeConfig = appRoutes.routes;
+    this.routes = appRoutes.getSpaMiddleWareAppRoutes();
 
     this.apiRoot = this.getEnv('APP_API_ROOT', '/api');
 

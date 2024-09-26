@@ -39,7 +39,8 @@ export default (app) => {
           clientInit: config.auth.keycloakJsClient,
           oidcScope: config.auth.oidcScope
         },
-        logger: config.logger
+        logger: config.logger,
+        routeConfig: config.routeConfig
       });
     },
 

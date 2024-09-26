@@ -27,12 +27,8 @@ export default class AppPageHome extends Mixin(LitElement)
     if ( this.pageId !== state.page ) return;
     // this.AppStateModel.showLoading();
 
-    this.AppStateModel.setTitle('Home Page');
-
-    const breadcrumbs = [
-      this.AppStateModel.store.breadcrumbs.home
-    ];
-    this.AppStateModel.setBreadcrumbs(breadcrumbs);
+    this.showPageTitle();
+    this.showBreadcrumbs();
 
     // const d = await this.getPageData();
     // const hasError = d.some(e => e.state === 'error');
