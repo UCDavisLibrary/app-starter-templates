@@ -1,3 +1,15 @@
+/**
+ * @description AppRoutes class for managing routes in a single page application
+ * @property {Array} routes - array of route objects with the following properties:
+ * - routeId {String} - unique identifier for the route
+ * - pageId {String} - unique identifier for the page - how the main ucdlib-pages element knows which page to show
+ * - pathSegment {String} - the path segment for the route (e.g. 'foo' for https://example.com/foo). '*' is a wildcard
+ * - pageTitle {String} - the page title - can be dynamically set from within app by setDynamicPageTitle method
+ * - breadcrumbText {String} - the breadcrumb text - can be dynamically set from within app by setDynamicPageBreadcrumbText method
+ * - parent {String} - routeId of the parent route
+ * - isHome {Boolean} - true if this is the home page
+ *
+ */
 class AppRoutes {
 
   constructor() {
@@ -42,28 +54,28 @@ class AppRoutes {
   }
 
   /**
-   * @description Get all breadcrumbs for a page
-   * @param {String} pageId
+   * @description Get all breadcrumbs for a route
+   * @param {String} routeId - routeId of the route
    * @param {Boolean} excludeHome - exclude the home page from the breadcrumbs
    * @returns {Array} - breadcrumbs array in format [{text: 'Home', link: '/'}, {text: 'Foo', link: '/foo'}]
    */
-  breadcrumbs(pageId, excludeHome){
+  breadcrumbs(routeId, excludeHome){
     let breadcrumbs = [];
 
-    let page = this.getByPageId(pageId);
-    if ( !page ) return breadcrumbs;
+    let route = this.getByRouteId(routeId);
+    if ( !route ) return breadcrumbs;
 
-    breadcrumbs.unshift({text: this.getBreadcrumbText(pageId), link: this.getPageLink(pageId)});
-    while ( page.parent ) {
-      page = this.getByPageId(page.parent);
-      if ( !page ) break;
-      breadcrumbs.unshift({text: this.getBreadcrumbText(page.pageId), link: this.getPageLink(page.pageId)});
+    breadcrumbs.unshift({text: this.getBreadcrumbText(routeId), link: this.getPageLink(routeId)});
+    while ( route.parent ) {
+      route = this.getByRouteId(route.parent);
+      if ( !route ) break;
+      breadcrumbs.unshift({text: this.getBreadcrumbText(route.routeId), link: this.getPageLink(route.routeId)});
     }
 
     if ( !excludeHome ){
       const home = this.routes.find(r => r.isHome);
       if ( home ) {
-        breadcrumbs.unshift({text: this.getBreadcrumbText(home.pageId), link: '/'});
+        breadcrumbs.unshift({text: this.getBreadcrumbText(home.routeId), link: '/'});
       }
     }
 
@@ -71,97 +83,125 @@ class AppRoutes {
   }
 
   /**
-   * @description Get a page title by pageId
-   * @param {String} pageId - pageId of the page
+   * @description Get a page title by routeId
+   * @param {String} routeId - routeId of the page
    * @returns {String} - page title
    */
-  pageTitle(pageId){
+  pageTitle(routeId){
     let title = '';
-    const page = this.getByPageId(pageId);
-    if ( !page ) return title;
+    const route = this.getByRouteId(routeId);
+    if ( !route ) return title;
 
-    if (typeof page.titleFunction === 'function' ) {
+    if (typeof route.titleFunction === 'function' ) {
       try {
-        title = page.titleFunction();
+        title = route.titleFunction();
       } catch (e) {
         this.log('error', 'pageTitle', 'error running custom function', e);
       }
     } else {
-      title = page.pageTitle;
+      title = route.pageTitle;
     }
     return title;
   }
 
   /**
    * @description Get breadcrumb text for a page
-   * @param {String} pageId
+   * @param {String} routeId
    * @returns {String}
    */
-  getBreadcrumbText(pageId){
+  getBreadcrumbText(routeId){
     let breadcrumb = '';
-    const page = this.getByPageId(pageId);
+    const route = this.getByRouteId(routeId);
 
-    if ( !page ) return breadcrumb;
-    if (typeof page.breadcrumbFunction === 'function' ) {
+    if ( !route ) return breadcrumb;
+    if (typeof route.breadcrumbFunction === 'function' ) {
       try {
-        breadcrumb = page.breadcrumbFunction();
+        breadcrumb = route.breadcrumbFunction();
       } catch (e) {
         this.log('error', 'getBreadcrumbText', 'error running custom function', e);
       }
     } else {
-      breadcrumb = page.breadcrumbText;
+      breadcrumb = route.breadcrumbText;
     }
     return breadcrumb;
   }
 
   /**
-   * @description Get the path segment for a page
-   * @param {String} pageId
+   * @description Get the path segment for a route
+   * @param {String} routeId
    * @returns {String}
    */
-  getPathSegment(pageId){
+  getPathSegment(routeId, ignoreCustomFunctions){
     let pathSegment = '';
-    const page = this.getByPageId(pageId);
-    if ( !page ) return pathSegment;
-    if (typeof page.pathSegmentFunction === 'function' ) {
+    const route = this.getByRouteId(routeId);
+    if ( !route ) return pathSegment;
+    if (typeof route.pathSegmentFunction === 'function' && !ignoreCustomFunctions ) {
       try {
-        pathSegment = page.pathSegmentFunction();
+        pathSegment = route.pathSegmentFunction();
       } catch (e) {
         this.log('error', 'getPathSegment', 'error running custom function', e);
       }
     } else {
-      pathSegment = page.pathSegment;
+      pathSegment = route.pathSegment;
     }
     return pathSegment;
   }
 
   /**
-   * @description Get all path segments for a page (including parent pages, in order)
-   * @param {String} pageId
+   * @description Get all path segments for a route (including parent routes, in order)
+   * @param {String} routeId - routeId of the page
    * @returns {Array} - path segments
    */
-  getPathSegments(pageId){
+  getPathSegments(routeId, ignoreCustomFunctions){
     const segments = [];
-    let page = this.getByPageId(pageId);
-    if ( !page ) return segments;
-    segments.push(this.getPathSegment(pageId));
-    while ( page.parent ) {
-      page = this.getByPageId(page.parent);
-      if ( !page ) break;
-      segments.unshift(this.getPathSegment(page.pageId));
+    let route = this.getByRouteId(routeId);
+    if ( !route ) return segments;
+    segments.push(this.getPathSegment(routeId, ignoreCustomFunctions));
+    while ( route.parent ) {
+      route = this.getByRouteId(route.parent);
+      if ( !route ) break;
+      segments.unshift(this.getPathSegment(route.routeId, ignoreCustomFunctions));
     }
     return segments;
   }
 
   /**
+   * @description Get a route from a path
+   * @param {Array} path - array of path segments, will usuallly come from CorkAppStateModel.location.path
+   * @returns {Object} - route object
+   */
+  getRouteFromPath(path){
+    if ( !Array.isArray(path) ){
+      path = path.split('/');
+    }
+    path = path.filter(p => p);
+
+    if ( !path.length ) return this.routes.find(r => r.isHome);
+
+    // find the first route that matches the path. * is a wildcard
+    let parent = null;
+    let route = null;
+    for ( let p of path ) {
+      route = this.routes.find(r => r.pathSegment === p && r.parent == parent);
+      if ( !route ) {
+        route = this.routes.find(r => r.pathSegment === '*' && r.parent == parent);
+      }
+      if ( !route ) return null;
+      parent = route.routeId;
+    }
+
+    return route;
+  }
+
+  /**
    * @description Get a page link
-   * @param {*} pageId
+   * @param {String} routeId - routeId of the page
    * @returns
    */
-  getPageLink(pageId){
-    const page = this.getByPageId(pageId);
+  getPageLink(routeId){
+    const page = this.getByRouteId(routeId);
     if ( !page ) return '';
-    const segments = this.getPathSegments(pageId);
+    const segments = this.getPathSegments(routeId);
     return `/${segments.join('/')}`;
   }
 
@@ -178,41 +218,54 @@ class AppRoutes {
   }
 
   /**
+   * @description Get a page record by routeId
+   * @param {String} routeId - routeId of the page
+   * @returns
+   */
+  getByRouteId(routeId) {
+    const page = this.routes.find(route => route.routeId === routeId);
+    if ( !page ){
+      this.log('warn', 'getByRouteId', 'page not found', routeId);
+    }
+    return page;
+  }
+
+  /**
    * @description Set a dynamic page title
-   * @param {String} pageId - pageId of the page
+   * @param {String} routeId - routeId of the page
    * @param {Function} titleFunction - function that returns a string
    * @returns {Boolean} - true if successful, false if not
    */
-  setDynamicPageTitle(pageId, titleFunction) {
-    const page = this.getByPageId(pageId);
-    if ( !page ) return false;
-    page.titleFunction = titleFunction;
+  setDynamicPageTitle(routeId, titleFunction) {
+    const route = this.getByRouteId(routeId);
+    if ( !route ) return false;
+    route.titleFunction = titleFunction;
     return true;
   }
 
   /**
    * @description Set a dynamic page breadcrumb text
-   * @param {String} pageId
+   * @param {String} routeId
    * @param {Function} breadcrumbFunction
    * @returns
    */
-  setDynamicPageBreadcrumbText(pageId, breadcrumbFunction) {
-    const page = this.getByPageId(pageId);
-    if ( !page ) return false;
-    page.breadcrumbFunction = breadcrumbFunction;
+  setDynamicPageBreadcrumbText(routeId, breadcrumbFunction) {
+    const route = this.getByRouteId(routeId);
+    if ( !route ) return false;
+    route.breadcrumbFunction = breadcrumbFunction;
     return true;
   }
 
   /**
    * @description Set a dynamic page path segment
-   * @param {String} pageId
+   * @param {String} routeId
    * @param {Function} pathSegmentFunction - function that returns a string
    * @returns
    */
-  setDynamicPagePathSegment(pageId, pathSegmentFunction) {
-    const page = this.getByPageId(pageId);
-    if ( !page ) return false;
-    page.pathSegmentFunction = pathSegmentFunction;
+  setDynamicPagePathSegment(routeId, pathSegmentFunction) {
+    const route = this.getByRouteId(routeId);
+    if ( !route ) return false;
+    route.pathSegmentFunction = pathSegmentFunction;
     return true;
   }
 

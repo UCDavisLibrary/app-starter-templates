@@ -15,9 +15,11 @@ class ServerConfig {
     this.title = this.getEnv('APP_TITLE', 'UC Davis Library Simple SPA');
 
     // TODO: Replace these with the routes that your SPA should handle
+    // see appRoutes.js for more information
     appRoutes.routes = [
-      {pageId: 'home', pageTitle: 'Home', isHome: true, breadcrumbText: 'Home', pathSegment: '', parent: null},
-      {pageId: 'foo', pageTitle: 'Fooz', breadcrumbText: 'Foo', pathSegment: 'foo', parent: null}
+      {routeId: 'home', pageId: 'home', pageTitle: 'Home', isHome: true, breadcrumbText: 'Home', pathSegment: '', parent: null},
+      {routeId: 'foo', pageId: 'foo', pageTitle: 'Foo', breadcrumbText: 'Foo', pathSegment: 'foo', parent: null},
+      {routeId: 'foobar', pageId: 'foo', pageTitle: 'FooBar', breadcrumbText: 'Bar', pathSegment: '*', parent: 'foo'}
     ];
     this.routeConfig = appRoutes.routes;
     this.routes = appRoutes.getSpaMiddleWareAppRoutes();

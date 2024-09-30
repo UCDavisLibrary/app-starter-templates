@@ -1,6 +1,7 @@
 import {AppStateModel} from '@ucd-lib/cork-app-state';
 import AppStateStore from '../stores/AppStateStore.js';
 import { appConfig } from '../../appGlobals.js';
+import appRoutes from '../../utils/appRoutes.js';
 
 /**
  * @description Model for handling generic app state, such as routing
@@ -44,6 +45,12 @@ class AppStateModelImpl extends AppStateModel {
    */
   refresh(){
     const state = this.store.data;
+    const pageId = state?.page;
+    const routeId = state?.routeId;
+    if ( !routeId ){
+      this.showError('Page not found');
+    }
+    this.store.emit('app-route-id-update', {pageId, routeId});
     this.store.emit(this.store.events.APP_STATE_UPDATE, state);
   }
 
@@ -54,14 +61,19 @@ class AppStateModelImpl extends AppStateModel {
    */
   _setPage(update){
     if ( !update ) return;
-    let p = this.store.defaultPage;
-    const route = this.getPathByIndex(0, update);
-
-    // TODO: Replace these with your own route->pageid mappings
-    if ( route === 'foo' ){
-      p = 'foo';
+    let pageId = 'page-not-loaded';
+    let routeId = '';
+    const route = appRoutes.getRouteFromPath(update.location.path);
+    if ( route ) {
+      pageId = route.pageId;
+      routeId = route.routeId;
+    } else {
+      this.showError('Page not found');
     }
-    update.page = p;
+
+    this.store.emit('app-route-id-update', {pageId, routeId});
+    update.page = pageId;
+    update.routeId = routeId;
 
   }
 

@@ -16,6 +16,10 @@ import '@fortawesome/fontawesome-free/js/ucdlib-custom.js';
 import { Registry, LitCorkUtils, Mixin, getLogger } from '@ucd-lib/cork-app-utils';
 import { appConfig } from "../../lib/appGlobals.js";
 
+// initialize route logger
+import appRoutes from '../../lib/utils/appRoutes.js';
+appRoutes.logger = getLogger('appRoutes');
+
 // init app state model
 import AppStateModel from "../../lib/cork/models/AppStateModel.js";
 AppStateModel.init(appConfig.routes);
@@ -37,10 +41,6 @@ import "./pages/app-page-alt-state.js";
 
 // global app components
 import './components/app-dialog-modal.js';
-
-// initialize route logger
-import appRoutes from '../../lib/utils/appRoutes.js';
-appRoutes.logger = getLogger('appRoutes');
 
 /**
  * @class AppMain
@@ -84,7 +84,7 @@ export default class AppMain extends Mixin(LitElement)
       models.push('AuthModel');
     }
     this._injectModel(...models);
-    this.page = this.AppStateModel.store.defaultPage;
+    this.page = 'home';
     this.AppStateModel.refresh();
   }
 
@@ -116,6 +116,11 @@ export default class AppMain extends Mixin(LitElement)
    */
   async _onAppStateUpdate(state) {
     const { page } = state;
+    if ( page === 'page-not-loaded' ) {
+      this.page = page;
+      window.scroll(0,0);
+      return;
+    }
 
     const bundle = this._getBundleName(page);
     let bundleAlreadyLoaded = true;
@@ -123,7 +128,7 @@ export default class AppMain extends Mixin(LitElement)
     // dynamically load code
     if ( !this.loadedBundles[bundle] ) {
       bundleAlreadyLoaded = false;
-      //this.AppStateModel.showLoading(e.page);
+      //this.AppStateModel.showLoading(state.page);
       this.loadedBundles[bundle] = this._loadBundle(bundle, page);
 
     }

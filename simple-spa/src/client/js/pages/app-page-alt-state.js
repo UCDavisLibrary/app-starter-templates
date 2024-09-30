@@ -43,7 +43,6 @@ export default class AppPageAltState extends Mixin(LitElement)
   }
 
   _onPageStateUpdate(e) {
-
     const { state } = e;
     if ( !['error', 'loading'].includes(state)){
       this.state = 'loading';
