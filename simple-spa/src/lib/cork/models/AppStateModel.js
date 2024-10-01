@@ -185,8 +185,13 @@ class AppStateModelImpl extends AppStateModel {
    *   this.AppStateModel.showLoaded(this.id);
    * }
    * @param {Array} responseArray Array of cork-app-utils service response objects from a Promise.allSettled call
+   * @param {Object} kwargs Object with the following optional properties:
+   * - errorMessage {String} - Custom error message to display
+   * - errorHeading {String} - Custom error heading to display
    */
-  showMessageIfServiceError(responseArray){
+  showMessageIfServiceError(responseArray, kwargs={}){
+    const customErrorMessage = kwargs.errorMessage;
+    const customErrorHeading = kwargs.errorHeading;
 
     // handle a single cork-app-utils response object
     if ( !Array.isArray(responseArray) ) responseArray = [{value: responseArray}];
@@ -208,13 +213,14 @@ class AppStateModelImpl extends AppStateModel {
 
     // handle standard responses
     const standardResponses = [
-      [404, 'Page not found'],
-      [401, 'You need to authenticate to view this page'],
-      [403, 'You are not authorized to view this page']
+      [404, (e) => `Service endpoint not found: ${e.error?.response?.url || ''}`],
+      [401, () => 'You need to authenticate to view this page or perform this action'],
+      [403, () => 'You are not authorized to view this page or perform this action'],
     ];
     for ( const sr of standardResponses ) {
-      if ( errors.find(e => e?.error?.response?.status === sr[0]) ){
-        this.showError(sr[1]);
+      const error = errors.find(e => e?.error?.response?.status === sr[0]);
+      if ( error ){
+        this.showError(customErrorMessage || sr[1](error), customErrorHeading);
         return true;
       }
     }
@@ -224,14 +230,14 @@ class AppStateModelImpl extends AppStateModel {
     const meaningfulError = errors.find(e => e?.error?.payload?.errorMessage || e?.error?.payload?.errorHeading);
     if ( meaningfulError ){
       this.showError(
-        meaningfulError.error.payload.errorMessage,
-        meaningfulError.error.payload.errorHeading,
+        customErrorMessage || meaningfulError.error.payload.errorMessage,
+        customErrorHeading || meaningfulError.error.payload.errorHeading,
         meaningfulError.error.payload.serverLogId
       );
       return true;
     }
 
-    this.showError();
+    this.showError(customErrorMessage, customErrorHeading);
     return true;
 
   }
@@ -301,6 +307,28 @@ class AppStateModelImpl extends AppStateModel {
       options.content = '';
     }
     this.store.emit('app-dialog-open', options);
+  }
+
+  /**
+   * @description Show dismissable toast banner in popup. Will disappear on next app-state-update event
+   * @param {Object} options Toast object with the following properties:
+   * - message {String} - The message to display
+   * - type {String} - The type of toast. Options: 'info', 'error', 'success'
+   */
+  showToast(option){
+    if ( !option.message ){
+      this.logger.warn('showToast called without message');
+      return;
+    }
+    this.store.emit('app-toast-update', option);
+  }
+
+  /**
+   * @description Dismissing all toasts in the queue
+   */
+  dismissToast(){
+    let dismissMessage = "Toast Dismissed";
+    this.store.emit('app-toast-dismiss', {message: dismissMessage});
   }
 
 }

@@ -30,6 +30,25 @@ class FooService extends BaseService {
     return this.store.data.list.get(id);
   }
 
+  async delete(fooId) {
+    let ido = {foo: fooId};
+    let id = payload.getKey(ido);
+
+    await this.checkRequesting(
+      id, this.store.data.delete,
+      () => this.request({
+        url : `${this.basePath}/${fooId}`,
+        fetchOptions: { method: 'DELETE' },
+        onUpdate : resp => this.store.set(
+          payload.generate(ido, resp),
+          this.store.data.delete
+        )
+      })
+    );
+
+    return this.store.data.delete.get(id);
+  }
+
 }
 
 const service = new FooService();

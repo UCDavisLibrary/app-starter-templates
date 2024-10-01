@@ -17,6 +17,14 @@ class FooModel extends BaseModel {
     return this.service.list();
   }
 
+  async delete(fooId) {
+    const r = await this.service.delete(fooId);
+    if ( r.state === 'loaded' ) {
+      this.store.data.list.cache = new Map();
+    }
+    return r;
+  }
+
 }
 
 const model = new FooModel();

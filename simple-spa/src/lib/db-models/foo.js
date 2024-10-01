@@ -58,11 +58,26 @@ class Foo extends BaseModel {
     return { id: r.res.rows[0].id, success: true };
   }
 
+  async delete(id){
+    const validation = await this.entityFields.validate({id}, { includeFields: ['id'] });
+    if ( !validation.valid ) {
+      return this.formatValidationError(validation);
+    }
+    const sql = `
+      DELETE FROM ${this.table}
+      WHERE id = $1
+    `;
+    const r = await pg.query(sql, [id]);
+    if ( r.error ) return this.formatError(r.error);
+
+    return { success: true };
+  }
+
   async update(data){
     data = this.entityFields.toDbObj(data);
     const validation = await this.entityFields.validate(data);
     if ( !validation.valid ) {
-      return this.returnValidationError(validation);
+      return this.formatValidationError(validation);
     }
     const id = data.id;
     delete data.id;

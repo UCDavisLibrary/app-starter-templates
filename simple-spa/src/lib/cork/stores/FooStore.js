@@ -6,7 +6,8 @@ class FooStore extends BaseStore {
     super();
 
     this.data = {
-      list: new LruStore({name: 'foo.list', max: 1})
+      list: new LruStore({name: 'foo.list', max: 1}),
+      delete: new LruStore({name: 'foo.delete'})
     };
 
     this.events = {};

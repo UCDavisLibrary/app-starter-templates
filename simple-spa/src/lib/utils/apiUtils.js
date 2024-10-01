@@ -1,4 +1,5 @@
 import nodeLogger from "./nodeLogger.js";
+import typeTransform from "./typeTransform.js";
 
 class ApiUtils {
 
@@ -7,24 +8,38 @@ class ApiUtils {
    * @param {*} req - Express request object
    * @param {*} res - Express response object
    * @param {*} dbResponse - Response from a database query
-   * @param {String} errorMessage - Error message to display to the user if 500 error
-   * @param {String} errorHeading - Error heading to display to the user if 500 error
+   * @param {Object} kwargs - Optional keyword arguments
+   * @param {String} kwargs.errorMessage - Custom error message to display to the user
+   * @param {String} kwargs.errorHeading - Custom error heading to display to the user
+   * @param {String} kwargs.errorMessage400 - Custom error message to display to the user for 400 errors
+   * @param {String} kwargs.errorHeading400 - Custom error heading to display to the user for 400 errors
+   * @param {String} kwargs.errorMessage500 - Custom error message to display to the user for 500 errors
+   * @param {String} kwargs.errorHeading500 - Custom error heading to display to the user for 500 errors
    * @returns {Boolean} - True if there was an error, false if not
    * @example
    * const dbResponse = await db.query();
-   * if ( this.returnIfDbError(req, res, dbResponse, 'Error retrieving foo') ) return;
+   * if ( this.returnIfDbError(req, res, dbResponse, {errorMessage: 'Error retrieving foo'}) ) return;
    */
-  returnIfDbError(req, res, dbResponse, errorMessage, errorHeading){
+  returnIfDbError(req, res, dbResponse, kwargs={}){
     if ( !dbResponse.error ) return false;
+    const errorMessage500 = kwargs.errorMessage500 || kwargs.errorMessage;
+    const errorHeading500 = kwargs.errorHeading500 || kwargs.errorHeading;
+    const errorMessage400 = kwargs.errorMessage400 || kwargs.errorMessage;
+    const errorHeading400 = kwargs.errorHeading400 || kwargs.errorHeading;
 
     // validation error
     if ( dbResponse.is400 ){
-      res.status(400).json(dbResponse);
+      const out = {
+        ...dbResponse
+      }
+      if ( errorHeading400 ) out.errorHeading = errorHeading400;
+      if ( errorMessage400 ) out.errorMessage = errorMessage400;
+      res.status(400).json(out);
       return true;
     }
 
     // 500 error
-    return this.return500IfDbError(req, res, dbResponse, errorMessage, errorHeading);
+    return this.return500IfDbError(req, res, dbResponse, errorMessage500, errorHeading500);
   }
 
   /**
@@ -56,9 +71,24 @@ class ApiUtils {
    * @param {String} errorMessage - Custom Error message to display to the user (optional)
    * @param {String} errorHeading - Custom Error heading to display to the user (optional)
    */
-  do403(res, errorMessage, errorHeading){
+  return403(res, errorMessage, errorHeading){
     if ( !errorMessage ) errorMessage = 'Not authorized to access this resource.';
     return res.status(403).json({errorMessage, errorHeading});
+  }
+
+  /**
+   * @description Return a 400 response if an id is missing or not a positive integer
+   * @param {*} res - Express response object
+   * @param {String|Number} id - Id to check
+   * @param {String} errorMessage - Custom Error message to display to the user (optional)
+   * @param {String} errorHeading - Custom Error heading to display to the user (optional)
+   * @returns
+   */
+  return400IfMissingId(res, id, errorMessage, errorHeading){
+    errorMessage = errorMessage || 'Missing id';
+    if ( !typeTransform.toPositiveInt(id) ){
+      return res.status(400).json({errorMessage, errorHeading});
+    }
   }
 
 }

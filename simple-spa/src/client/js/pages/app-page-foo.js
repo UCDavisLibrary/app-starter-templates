@@ -56,6 +56,17 @@ export default class AppPageFoo extends Mixin(LitElement)
     }
   }
 
+  _onFooDeleteUpdate(e) {
+    if ( e.state === 'error' ){
+      return this.AppStateModel.showMessageIfServiceError(e, {errorHeading: 'Error deleting foo item'});
+    }
+    this.AppStateModel.showToast({
+      message: 'Foo item deleted',
+      type: 'success'
+    });
+    this.AppStateModel.refresh();
+  }
+
   _onEditClick(item){}
 
   _onDeleteClick(item){
@@ -75,7 +86,7 @@ export default class AppPageFoo extends Mixin(LitElement)
 
   _onAppDialogAction(e){
     if( e.action === 'delete-foo' ) {
-      console.log('Delete foo item', e.data.item);
+      this.FooModel.delete(e.data.item.id);
     }
   }
 

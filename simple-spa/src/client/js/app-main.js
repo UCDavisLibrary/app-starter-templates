@@ -41,6 +41,7 @@ import "./pages/app-page-alt-state.js";
 
 // global app components
 import './components/app-dialog-modal.js';
+import './components/app-toast.js';
 
 /**
  * @class AppMain
@@ -84,8 +85,10 @@ export default class AppMain extends Mixin(LitElement)
       models.push('AuthModel');
     }
     this._injectModel(...models);
-    this.page = 'home';
+    this.page = 'page-not-loaded';
     this.AppStateModel.refresh();
+
+    this.logger.info('constructed');
   }
 
   /**

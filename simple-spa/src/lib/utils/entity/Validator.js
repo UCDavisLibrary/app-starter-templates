@@ -135,7 +135,7 @@ export default class Validator {
 
     const { errorType } = this.errorTypes.invalidType;
     const message = `This field must be a ${fieldType}`;
-    if ( !acceptedTypes[fieldType](value) ){
+    if ( !acceptedTypes[fieldType].call(this, value) ){
       this.addError(field[this.keyType], errorType, message);
     }
   }

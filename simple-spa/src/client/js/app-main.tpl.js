@@ -35,5 +35,6 @@ return html`
     <app-page-foo page-id='foo'></app-page-foo>
   </ucdlib-pages>
   <app-dialog-modal></app-dialog-modal>
+  <app-toast></app-toast>
 
 `;}
