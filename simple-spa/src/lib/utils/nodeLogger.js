@@ -30,6 +30,21 @@ class NodeLogger {
     }
   }
 
+  stringify(obj) {
+
+    if ( obj instanceof Error ){
+      console.log('here');
+      return JSON.stringify({
+        name: obj.name,
+        message: obj.message,
+        stack: obj.stack,
+        ...obj
+      });
+    }
+
+    return JSON.stringify(obj);
+  }
+
   /**
    * @description Log a server error
    * @param {*} req - Express request object
@@ -48,6 +63,21 @@ class NodeLogger {
 
   _formatServerRequest(req, error) {
     const logId = this._generateLogId();
+
+    let errorObj = error;
+    try {
+      if ( typeof error === 'object') {
+        errorObj = {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          ...error
+        }
+      }
+    } catch (error) {
+      this.log('Error formatting error object', error);
+    }
+
     return {
       timestamp: (new Date()).toISOString(),
       logId,
@@ -59,7 +89,7 @@ class NodeLogger {
         params: req.params
       },
       user: req.auth?.token?.id,
-      error
+      error: errorObj
     }
   }
 }

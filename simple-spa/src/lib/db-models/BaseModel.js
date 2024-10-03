@@ -8,13 +8,17 @@ export default class BaseModel {
    * @param {Object} v - object returned by validation method
    * @returns {Object}
    */
-  formatValidationError(v){
-    const error = new Error('Validation error');
+  formatValidationError(v, message='Validation error'){
+    const error = new Error(message);
     return {
       ...v,
       error,
       is400: true,
     };
+  }
+
+  customValidationError(message){
+    return this.formatValidationError({}, message);
   }
 
   /**

@@ -87,7 +87,7 @@ class Foo extends BaseModel {
       SET ${update.sql}
       WHERE id = $${update.values.length + 1}
     `;
-    const r = await pg.query(sql, update.values);
+    const r = await pg.query(sql, [...update.values, id]);
     if ( r.error ) return this.formatError(r.error);
 
     return { success: true };

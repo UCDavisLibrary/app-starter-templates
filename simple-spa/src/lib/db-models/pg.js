@@ -70,12 +70,37 @@ class Pg {
    * @param {Boolean} underscore - Convert keys to underscore
    * @returns {Object} {sql: 'foo = $1, bar = $2', values: ['fooValue', 'barValue]}
    */
-  toUpdateClause(queryObject){
+  toUpdateClause(queryObject, kwargs){
+    queryObject = this._filterObject(queryObject, kwargs?.includeFields, kwargs?.excludeFields);
     return this._toEqualsClause(queryObject, ', ');
   }
 
-  prepareObjectForUpdate(obj){
-    return this.toUpdateClause(obj);
+  prepareObjectForUpdate(obj, kwargs){
+    return this.toUpdateClause(obj, kwargs);
+  }
+
+  /**
+   * @description Filter a key-value object
+   * @param {Object} obj
+   * @param {Array} includeFields - Fields to include. Takes precedence over excludeFields
+   * @param {Array} excludeFields - Fields to exclude
+   */
+  _filterObject(obj, includeFields, excludeFields){
+    if ( Array.isArray(includeFields) && includeFields.length ){
+      const out = {};
+      for (const f of includeFields){
+        if ( obj[f] !== undefined ) out[f] = obj[f];
+      }
+      return out;
+    }
+    if ( Array.isArray(excludeFields) && excludeFields.length ){
+      const out = {...obj};
+      for (const f of excludeFields){
+        delete out[f];
+      }
+      return out;
+    }
+    return obj;
   }
 
   /**
@@ -84,6 +109,7 @@ class Pg {
    * @returns {Object} {keys: ['foo', 'bar'], values: ['fooValue', 'barValue'], placeholders: ['$1', '$2']}
    */
   prepareObjectForInsert(obj){
+    obj = this._filterObject(obj, kwargs?.includeFields, kwargs?.excludeFields);
     const out = {keys: [], values: [], placeholders: []};
     for (const k in obj) {
       out.keys.push(k);

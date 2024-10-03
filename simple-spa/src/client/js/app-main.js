@@ -25,6 +25,7 @@ import AppStateModel from "../../lib/cork/models/AppStateModel.js";
 AppStateModel.init(appConfig.routes);
 
 // import data models
+import '../../lib/cork/models/SettingsModel.js';
 // TODO: Replace with your own models
 import "../../lib/cork/models/FooModel.js";
 

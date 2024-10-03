@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { render } from "./app-page-foo.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import AppPageElement from '../mixins/AppPageElement.js';
+import SettingsController from '../controllers/SettingsController.js';
 
 
 export default class AppPageFoo extends Mixin(LitElement)
@@ -19,7 +20,10 @@ export default class AppPageFoo extends Mixin(LitElement)
     this.render = render.bind(this);
     this.fooData = [];
 
+    this.settings = new SettingsController(this, 'foo');
+
     this._injectModel('AppStateModel', 'FooModel');
+
   }
 
   /**
@@ -45,7 +49,8 @@ export default class AppPageFoo extends Mixin(LitElement)
    */
   async getPageData(){
     const promises = [
-      this.FooModel.list()
+      this.FooModel.list(),
+      this.settings.get()
     ];
     return Promise.allSettled(promises);
   }

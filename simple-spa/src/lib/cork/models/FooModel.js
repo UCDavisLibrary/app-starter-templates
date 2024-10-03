@@ -20,7 +20,7 @@ class FooModel extends BaseModel {
   async delete(fooId) {
     const r = await this.service.delete(fooId);
     if ( r.state === 'loaded' ) {
-      this.store.data.list.cache = new Map();
+      this.store.data.list.purge();
     }
     return r;
   }
