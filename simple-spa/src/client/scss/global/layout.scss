@@ -25,6 +25,11 @@
 .width-100 {
   width: 100%;
 }
-.container-type--normal {
-  container-type: normal !important;
+
+.grid--simple-override {
+  --l-gap: 1rem;
+  > * {
+    container-type: normal !important;
+    margin-top: 0 !important;
+  }
 }

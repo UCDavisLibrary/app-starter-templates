@@ -23,7 +23,7 @@ class Settings extends BaseModel {
       {
         dbName: 'value',
         validation: {
-          charLimit: 2000
+          charLimit: 3000
         }
       },
       { dbName: 'label' },
@@ -87,51 +87,39 @@ class Settings extends BaseModel {
     if ( !categories.length ) {
       return this.customValidationError('At least one category must be provided');
     }
-    const res = await pg.query(`SELECT * FROM settings WHERE categories && $1`, [categories]);
+    const sql = `
+      SELECT * FROM ${this.table}
+      WHERE categories && $1
+      ORDER BY label
+      `
+    const res = await pg.query(sql, [categories]);
     if( res.error ) return res;
     return this.entityFields.toJsonArray(res.res.rows);
   }
 
   /**
-   * @description Update settings value or use_default_value flag
-   * @param {Array} settings - array of settings objects
-   * @returns {Object} - { success: true } or { error: Error }
+   * @description Update a setting
+   * @param {Object} setting - a setting object
+   * @returns {Object} - { success: true } or { error }
    */
-  async updateSettings(settings){
-    if ( !Array.isArray(settings) ) settings = [settings];
-    settings = this.entityFields.toDbArray(settings);
+  async update(setting){
+    setting = this.entityFields.toDbObj(setting);
     const editableFields = ['value', 'use_default_value'];
-    for ( const s of settings ) {
-      const validation = await this.entityFields.validate(s, { includeFields: [...editableFields, 'settings_id'] });
-      if ( !validation.valid ) {
-        return this.formatValidationError(validation);
-      }
+    const validation = await this.entityFields.validate(setting, { includeFields: [...editableFields, 'settings_id'] });
+    if ( !validation.valid ) {
+      return this.formatValidationError(validation);
     }
 
-    const client = await pg.pool.connect();
-    try {
-      await client.query('BEGIN');
+    const id = setting.settings_id;
+    const update = pg.prepareObjectForUpdate(setting, { includeFields: editableFields });
+    const sql = `
+      UPDATE ${this.table}
+      SET ${update.sql}
+      WHERE settings_id = $${update.values.length + 1}
+    `;
+    const r = await pg.query(sql, [...update.values, id]);
+    if ( r.error ) return this.formatError(r.error);
 
-      for ( const s of settings ) {
-        const id = s.settings_id;
-        const update = pg.prepareObjectForUpdate(data, { includeFields: editableFields });
-        const sql = `
-          UPDATE ${this.table}
-          SET ${update.sql}
-          WHERE settings_id = $${update.values.length + 1}
-        `;
-        await client.query(sql, [...update.values, id]);
-      }
-
-      await client.query('COMMIT');
-    } catch (error) {
-
-      await client.query('ROLLBACK');
-      return this.formatError(error);
-
-    } finally {
-      client.release();
-    }
     return { success: true };
   }
 

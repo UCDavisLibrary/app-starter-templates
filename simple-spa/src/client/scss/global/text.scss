@@ -1,0 +1,25 @@
+.bold {
+  font-weight: 700;
+}
+.small {
+  font-size: .875rem;
+}
+.small--75 {
+  font-size: .75rem;
+}
+.grey {
+  color: #4C4C4C;
+}
+.keep-together {
+  white-space: nowrap;
+}
+a.underline-hover {
+  cursor: pointer;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+  &.inherit-color {
+    color: inherit;
+  }
+}

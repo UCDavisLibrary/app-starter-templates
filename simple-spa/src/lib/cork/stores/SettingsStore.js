@@ -7,6 +7,7 @@ class SettingsStore extends BaseStore {
 
     this.data = {
       getByCategory: new LruStore({name: 'settings.get-by-category'}),
+      update: new LruStore({name: 'settings.update'})
     };
     this.events = {};
   }

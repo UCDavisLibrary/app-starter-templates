@@ -1,6 +1,8 @@
+@use './dialog.scss' as dialog;
 @use './form.scss' as form;
 @use './icon.scss' as icon;
 @use './layout.scss' as layout;
+@use './text.scss' as text;
 
 [hidden] {
   display: none !important;

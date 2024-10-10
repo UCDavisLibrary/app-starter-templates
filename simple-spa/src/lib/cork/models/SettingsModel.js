@@ -17,6 +17,14 @@ class SettingsModel extends BaseModel {
     return this.service.getByCategory(category);
   }
 
+  async update(data) {
+    const r = await this.service.update(data);
+    if ( r.state === 'loaded' ) {
+      this.store.data.getByCategory.purge();
+    }
+    return r;
+  }
+
 }
 
 const model = new SettingsModel();

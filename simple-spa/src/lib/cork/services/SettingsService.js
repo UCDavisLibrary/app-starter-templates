@@ -30,6 +30,26 @@ class SettingsService extends BaseService {
     return this.store.data.getByCategory.get(id);
   }
 
+  async update(data){
+    let ido = {settingsId: data.settingsId};
+    let id = payload.getKey(ido);
+
+    await this.request({
+      url : `${this.basePath}`,
+      fetchOptions: {
+        method : 'PUT',
+        body: data
+      },
+      json: true,
+      onUpdate : resp => this.store.set(
+        payload.generate(ido, resp),
+        this.store.data.update
+      )
+    });
+
+    return this.store.data.update.get(id);
+  }
+
 }
 
 const service = new SettingsService();

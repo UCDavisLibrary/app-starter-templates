@@ -13,4 +13,10 @@ export default (api) => {
     if ( apiUtils.returnIfDbError(req, res, response, {errorMessage: 'Error retrieving settings'}) ) return;
     res.json(response);
   });
+
+  api.put('/settings', protect('hasAdminAccess'), async (req, res) => {
+    let response = await settingsModel.update(req.body);
+    if ( apiUtils.returnIfDbError(req, res, response, {errorMessage: 'Error updating setting'}) ) return;
+    res.json(response);
+  });
 }
