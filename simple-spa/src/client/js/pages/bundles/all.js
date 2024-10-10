@@ -4,5 +4,4 @@
  */
 
 // TODO: Replace these with your own pages
-import "../app-page-home.js";
 import "../app-page-foo.js";

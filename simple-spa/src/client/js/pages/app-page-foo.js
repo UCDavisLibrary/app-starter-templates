@@ -20,9 +20,9 @@ export default class AppPageFoo extends Mixin(LitElement)
     this.render = render.bind(this);
     this.fooData = [];
 
-    this.settings = new SettingsController(this, 'foo');
+    this.settings = new SettingsController(this);
 
-    this._injectModel('AppStateModel', 'FooModel');
+    this._injectModel('FooModel');
 
   }
 

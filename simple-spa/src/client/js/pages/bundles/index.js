@@ -9,6 +9,9 @@
 const defs = {
   all : [
     'home', 'foo'
+  ],
+  admin: [
+    'admin-home', 'admin-settings'
   ]
 };
 

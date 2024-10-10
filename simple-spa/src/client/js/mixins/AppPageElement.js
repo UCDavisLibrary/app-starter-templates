@@ -6,6 +6,11 @@ import appRoutes from "../../../lib/utils/appRoutes.js";
  */
 export default (superClass) => class extends superClass {
 
+  constructor() {
+    super();
+    this._injectModel('AppStateModel');
+  }
+
   // disable the shadow dom
   // all styles should be placed in app scss files
   createRenderRoot() {

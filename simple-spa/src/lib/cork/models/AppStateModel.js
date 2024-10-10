@@ -259,7 +259,11 @@ class AppStateModelImpl extends AppStateModel {
    * @description Close the app's primary nav menu
    */
   closeNav(){
-    const ele = document.querySelector('ucd-theme-header');
+    let ele = document.querySelector('ucd-theme-header');
+    if ( ele ) {
+      ele.close();
+    }
+    ele = document.querySelector('ucd-theme-quick-links');
     if ( ele ) {
       ele.close();
     }

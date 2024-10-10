@@ -13,8 +13,15 @@ return html`
     <ucd-theme-primary-nav>
       <a href='/foo'>Foo</a>
     </ucd-theme-primary-nav>
+
+    <ucd-theme-quick-links
+      title="Admin"
+      style-modifiers="highlight"
+      ?hidden=${!this.AuthModel.getToken().hasAdminAccess}>
+      <a href="/admin/settings">General Settings</a>
+    </ucd-theme-quick-links>
   </ucd-theme-header>
-  <!-- <ucdlib-iam-alert></ucdlib-iam-alert> -->
+  <app-banner-textbox></app-banner-textbox>
 
   <section ?hidden=${!this.pageIsLoaded || !this.showPageTitle}>
     <h1 class="page-title">${this.pageTitle}</h1>
@@ -33,6 +40,8 @@ return html`
     <app-page-alt-state page-id=${this._notLoadedPageId}></app-page-alt-state>
     <app-page-home page-id='home'></app-page-home>
     <app-page-foo page-id='foo'></app-page-foo>
+    <app-page-admin-home page-id='admin-home'></app-page-admin-home>
+    <app-page-admin-settings page-id='admin-settings'></app-page-admin-settings>
   </ucdlib-pages>
   <app-dialog-modal></app-dialog-modal>
   <app-toast></app-toast>

@@ -19,7 +19,9 @@ class ServerConfig {
     appRoutes.routes = [
       {routeId: 'home', pageId: 'home', pageTitle: 'Home', isHome: true, breadcrumbText: 'Home', pathSegment: '', parent: null},
       {routeId: 'foo', pageId: 'foo', pageTitle: 'Foo', breadcrumbText: 'Foo', pathSegment: 'foo', parent: null},
-      {routeId: 'foobar', pageId: 'foo', pageTitle: 'FooBar', breadcrumbText: 'Bar', pathSegment: '*', parent: 'foo'}
+      {routeId: 'foobar', pageId: 'foo', pageTitle: 'FooBar', breadcrumbText: 'Bar', pathSegment: '*', parent: 'foo'},
+      {routeId: 'admin-home', pageId: 'admin-home', pageTitle: 'Application Administration', breadcrumbText: 'Admin', pathSegment: 'admin', parent: null},
+      {routeId: 'admin-settings', pageId: 'admin-settings', pageTitle: 'General Settings', breadcrumbText: 'General Settings', pathSegment: 'settings', parent: 'admin-home'}
     ];
     this.routeConfig = appRoutes.routes;
     this.routes = appRoutes.getSpaMiddleWareAppRoutes();

@@ -5,6 +5,7 @@ import { render } from "./app-main.tpl.js";
 import '@ucd-lib/theme-elements/brand/ucd-theme-primary-nav/ucd-theme-primary-nav.js';
 import '@ucd-lib/theme-elements/brand/ucd-theme-header/ucd-theme-header.js';
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-branding-bar/ucdlib-branding-bar.js';
+import '@ucd-lib/theme-elements/brand/ucd-theme-quick-links/ucd-theme-quick-links.js'
 import '@ucd-lib/theme-elements/ucdlib/ucdlib-pages/ucdlib-pages.js';
 import { MainDomElement } from "@ucd-lib/theme-elements/utils/mixins/main-dom-element.js";
 
@@ -39,8 +40,10 @@ Registry.ready();
 // registry of app page bundles - pages are dynamically loaded on appStateUpdate
 import bundles from "./pages/bundles/index.js";
 import "./pages/app-page-alt-state.js";
+import "./pages/app-page-home.js";
 
 // global app components
+import './components/app-banner-textbox.js';
 import './components/app-dialog-modal.js';
 import './components/app-toast.js';
 
@@ -120,7 +123,7 @@ export default class AppMain extends Mixin(LitElement)
    */
   async _onAppStateUpdate(state) {
     const { page } = state;
-    if ( page === 'page-not-loaded' ) {
+    if ( ['home', 'page-not-loaded'].includes(page) ) {
       this.page = page;
       window.scroll(0,0);
       return;
@@ -220,6 +223,8 @@ export default class AppMain extends Mixin(LitElement)
 
     if( bundle == 'all' ) {
       return import(/* webpackChunkName: "pages" */ "./pages/bundles/all.js");
+    } else if( bundle == 'admin' ) {
+      return import(/* webpackChunkName: "admin" */ "./pages/bundles/admin.js");
     }
     console.warn(`AppMain: bundle ${bundle} not found for page ${page}. Check pages/bundles/index.js`);
     return false;
@@ -242,7 +247,8 @@ export default class AppMain extends Mixin(LitElement)
   // set up listeners keycloak listeners
   kc.onAuthRefreshError = () => {AuthModel.logout();};
   kc.onAuthError = () => {AuthModel.redirectUnauthorized();};
-  kc.onAuthSuccess = () => {
+  kc.onAuthSuccess = async () => {
+    await AuthModel.setTokenServerCache();
     customElements.define('app-main', AppMain);
     AuthModel.init();
     AuthModel._onAuthRefreshSuccess();

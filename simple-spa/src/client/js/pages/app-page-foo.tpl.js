@@ -5,7 +5,7 @@ return html`
   <div class='l-container'>
     <div class='l-basic--flipped'>
       <div class="l-content">
-        <p>Here is a list of foo retrieved from the database/api using a cork-app-utils model:</p>
+        <p>${this.settings.fooDescription}</p>
         ${this.fooData.length ? html`
           <div>
             ${this.fooData.map(item => html`

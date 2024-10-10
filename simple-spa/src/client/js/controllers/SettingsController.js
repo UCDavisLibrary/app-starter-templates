@@ -1,12 +1,24 @@
 import { getLogger } from '@ucd-lib/cork-app-utils';
 
+/**
+ * @description Controller for fetching settings from the SettingsModel
+ */
 export default class SettingsController {
-  constructor(host, category, propertyMapper) {
+
+  /**
+   *
+   * @param {LitElement} host - The host element that will use the settings
+   * @param {Array} propertyMapper - Array of setting key strings or objects with the following properties:
+   * - setting: setting key
+   * - property: property name to set on this class
+   * - defaultValue: default value if setting is not found
+   * @param {String} category - The category of settings to fetch. Defaults to the host constructor name.
+   */
+  constructor(host, propertyMapper, category) {
     this.logger = getLogger(`SettingsController-${host.constructor.name}-${category}`);
     this.host = host;
-    this.category = category;
-    this.categoryConfig = categoryConfig;
-    this.propertyMapper = propertyMapper;
+    this.category = category || host.constructor.name;
+    this._setPropertyMapper(propertyMapper);
     host.addController(this);
     this._init();
   }
@@ -18,7 +30,7 @@ export default class SettingsController {
    * - property: property name to set on this class
    * - defaultValue: default value if setting is not found
    */
-  setPropertyMapper(propertyMapper=[]){
+  _setPropertyMapper(propertyMapper=[]){
     const defaultValue = '';
     this.propertyMapper = propertyMapper.map(item => {
       if ( typeof item === 'string' ) {
@@ -32,7 +44,6 @@ export default class SettingsController {
         item.defaultValue = defaultValue;
       }
       return item;
-
     });
   }
 
@@ -68,22 +79,49 @@ export default class SettingsController {
     this.host._injectModel('SettingsModel');
 
     // check if settings are already loaded and call callback if they are
+    // essential when doing code splitting
     const data = this.host.SettingsModel.store.data.getByCategory.get(this.category);
     if ( data?.state === 'loaded' ) {
       this.logger.debug('Settings already loaded, calling callback');
       this._onSettingsUpdate(data);
     } else {
-      // set default host properties
-      this.propertyMapper.forEach(item => {
-        this[item.property] = item.defaultValue;
-      });
+      this.logger.debug('Settings not loaded, setting up default properties');
+      this._setDefaults(true);
+    }
+  }
+
+  /**
+   * @description Set the default values for the setting properties on this class
+   * @param {Boolean} requestUpdate - if true, request an update from the host
+   */
+  _setDefaults(requestUpdate){
+    this.propertyMapper.forEach(item => {
+      this[item.property] = item.defaultValue;
+    });
+    if ( requestUpdate ){
       this.host.requestUpdate();
     }
   }
 
+  /**
+   * @description Update the properties on this class with the settings from the SettingsModel
+   * @param {Object} e - SettingsModel getByCategory update event
+   */
   _onSettingsUpdate(e){
     if ( e.state !== 'loaded' || e.settingsCategory != this.category ) return;
-    this.logger.info('Settings loaded', e);
+    this.logger.debug('Settings loaded', e);
 
+    if ( !this.propertyMapper.length ){
+      this._setPropertyMapper(e.payload.map(item => item.key));
+      this._setDefaults(false);
+    }
+
+    this.propertyMapper.forEach(mapper => {
+      let setting = e.payload.find(item => item.key === mapper.setting);
+      if ( setting ) {
+        this[mapper.property] = setting.useDefaultValue ? setting.defaultValue : setting.value;
+      }
+    });
+    this.host.requestUpdate();
   }
 }
