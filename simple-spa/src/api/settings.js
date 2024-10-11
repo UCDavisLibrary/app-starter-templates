@@ -10,13 +10,13 @@ export default (api) => {
   api.get('/settings/:category', protect('hasBasicAccess'), async (req, res) => {
     const category = req.params.category;
     let response = await settingsModel.getByCategory(category);
-    if ( apiUtils.returnIfDbError(req, res, response, {errorMessage: 'Error retrieving settings'}) ) return;
+    if ( apiUtils.returnIfModelError(req, res, response, 'Error retrieving settings') ) return;
     res.json(response);
   });
 
   api.put('/settings', protect('hasAdminAccess'), async (req, res) => {
     let response = await settingsModel.update(req.body);
-    if ( apiUtils.returnIfDbError(req, res, response, {errorMessage: 'Error updating setting'}) ) return;
+    if ( apiUtils.returnIfModelError(req, res, response, 'Unable to update settings') ) return;
     res.json(response);
   });
 }

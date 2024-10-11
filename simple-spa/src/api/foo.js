@@ -9,17 +9,17 @@ export default (api) => {
 
   api.get('/foo', protect('hasBasicAccess'), async (req, res) => {
     let response = await foo.getAll();
-    if ( apiUtils.returnIfDbError(req, res, response, {errorMessage: 'Error retrieving a list of foo'}) ) return;
+    if ( apiUtils.returnIfModelError(req, res, response, 'Error retrieving a list of foo') ) return;
     res.json(response);
   });
 
   api.delete('/foo/:id', protect('hasBasicAccess'), async (req, res) => {
     let response = await foo.delete(req.params.id);
     const kwargs = {
-      errorMessage500: 'A database error occurred deleting foo item',
+      errorHeading500: 'A database error occurred deleting foo item',
       errorMessage400: 'Foo item not found',
     }
-    if ( apiUtils.returnIfDbError(req, res, response, kwargs) ) return;
+    if ( apiUtils.returnIfModelError(req, res, response, kwargs) ) return;
     res.json(response);
   });
 

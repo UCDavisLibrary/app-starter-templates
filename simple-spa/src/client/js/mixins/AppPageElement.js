@@ -1,4 +1,5 @@
 import appRoutes from "../../../lib/utils/appRoutes.js";
+import ValidationContoller from "../controllers/ValidationController.js";
 
 /**
  * @description Mixin for app page elements
@@ -9,6 +10,8 @@ export default (superClass) => class extends superClass {
   constructor() {
     super();
     this._injectModel('AppStateModel');
+
+    this.validation = new ValidationContoller(this);
   }
 
   // disable the shadow dom
@@ -74,6 +77,13 @@ export default (superClass) => class extends superClass {
 
   hideBreadcrumbs(){
     this.AppStateModel.setBreadcrumbs(false);
+  }
+
+  /**
+   * @description Show the current page. Ususally used to come back from a loading state.
+   */
+  show(){
+    this.AppStateModel.showLoaded(this.pageId);
   }
 
   /**

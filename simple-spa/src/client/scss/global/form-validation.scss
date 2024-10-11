@@ -1,0 +1,25 @@
+.validation-field-error {
+  input {
+    border: 1px solid #c10230;
+  }
+  textarea {
+    border: 1px solid #c10230;
+  }
+  .validation-field-error-message {
+    color: #c10230;
+    display: block;
+  }
+  label {
+    color: #c10230;
+  }
+}
+fieldset.validation-field-error {
+  border-top: 3px solid #c10230;
+
+  > legend {
+    color: #c10230;
+  }
+}
+.validation-field-error-message {
+  display: none;
+}

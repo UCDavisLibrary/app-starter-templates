@@ -117,6 +117,7 @@ export default class AppPageAdminSettings extends Mixin(LitElement)
    */
   _onSettingClick(setting){
     this.editSetting = {...setting};
+    this.validation.reset();
     this.editModalRef.value.showModal();
   }
 
@@ -134,13 +135,21 @@ export default class AppPageAdminSettings extends Mixin(LitElement)
       return;
     }
 
-    this.closeEditModal();
 
     if ( e.state === 'error' ){
-      return this.AppStateModel.showMessageIfServiceError(e);
+      if ( e.error?.payload?.is400 ) {
+        this.show();
+        this.validation.showErrors(e);
+        return;
+      } else {
+        this.closeEditModal();
+        return this.AppStateModel.showMessageIfServiceError(e);
+      }
+
     }
 
     if ( e.state === 'loaded' ){
+      this.closeEditModal();
       this.AppStateModel.refresh();
       this.AppStateModel.showToast({message: 'Setting updated', type: 'success'});
     }

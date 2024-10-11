@@ -7,7 +7,7 @@ class ApiUtils {
    * @description Senda 400 or 500 response if there is an error in a database query
    * @param {*} req - Express request object
    * @param {*} res - Express response object
-   * @param {*} dbResponse - Response from a database query
+   * @param {*} modelResponse - Response from a db model query
    * @param {Object} kwargs - Optional keyword arguments
    * @param {String} kwargs.errorMessage - Custom error message to display to the user
    * @param {String} kwargs.errorHeading - Custom error heading to display to the user
@@ -18,19 +18,23 @@ class ApiUtils {
    * @returns {Boolean} - True if there was an error, false if not
    * @example
    * const dbResponse = await db.query();
-   * if ( this.returnIfDbError(req, res, dbResponse, {errorMessage: 'Error retrieving foo'}) ) return;
+   * if ( this.returnIfModelError(req, res, dbResponse, {errorMessage: 'Error retrieving foo'}) ) return;
    */
-  returnIfDbError(req, res, dbResponse, kwargs={}){
-    if ( !dbResponse.error ) return false;
-    const errorMessage500 = kwargs.errorMessage500 || kwargs.errorMessage;
+  returnIfModelError(req, res, modelResponse, kwargs={}){
+    if ( !modelResponse.error ) return false;
+
+    if ( typeof kwargs === 'string' ){
+      kwargs = {errorHeading: kwargs};
+    }
+    const errorMessage500 = kwargs.errorMessage500 || kwargs.errorMessage || 'A unexpected error has occurred. Please try again later.';
     const errorHeading500 = kwargs.errorHeading500 || kwargs.errorHeading;
-    const errorMessage400 = kwargs.errorMessage400 || kwargs.errorMessage;
-    const errorHeading400 = kwargs.errorHeading400 || kwargs.errorHeading;
+    const errorMessage400 = kwargs.errorMessage400 || kwargs.errorMessage || 'Validation failed. Please review the form and submit again.';
+    const errorHeading400 = kwargs.errorHeading400 || kwargs.errorHeading || 'Submission Error';
 
     // validation error
-    if ( dbResponse.is400 ){
+    if ( modelResponse.is400 ){
       const out = {
-        ...dbResponse
+        ...modelResponse
       }
       if ( errorHeading400 ) out.errorHeading = errorHeading400;
       if ( errorMessage400 ) out.errorMessage = errorMessage400;
@@ -39,7 +43,7 @@ class ApiUtils {
     }
 
     // 500 error
-    return this.return500IfDbError(req, res, dbResponse, errorMessage500, errorHeading500);
+    return this.return500IfDbError(req, res, modelResponse, errorMessage500, errorHeading500);
   }
 
   /**

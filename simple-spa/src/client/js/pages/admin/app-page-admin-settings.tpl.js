@@ -41,16 +41,21 @@ function renderEditModal(){
     <dialog ${ref(this.editModalRef)}>
       <form @submit=${this._onEditSubmit}>
         <h2 class='heading--highlight u-space-mb'>${s.label}</h2>
-        <div class='field-container checkbox' ?hidden=${!s.defaultValue}>
-          <input type="checkbox"
-              id="${defaultValueId}"
-              @input=${() => this._onSettingValueInput('useDefaultValue', !s.useDefaultValue)}
-              .checked=${s.useDefaultValue} />
-          <label for="${defaultValueId}">Use default value</label>
+        ${this.validation.renderErrorMessage()}
+        <div class='field-container ${this.validation.fieldErrorClass('useDefaultValue')}' ?hidden=${!s.defaultValue}>
+          <div class='checkbox'>
+            <input type="checkbox"
+                id="${defaultValueId}"
+                @input=${() => this._onSettingValueInput('useDefaultValue', !s.useDefaultValue)}
+                .checked=${s.useDefaultValue} />
+            <label for="${defaultValueId}">Use default value</label>
+          </div>
+          ${this.validation.renderFieldErrorMessages('useDefaultValue')}
         </div>
-        <div class='field-container'>
+        <div class='field-container ${this.validation.fieldErrorClass('value')}'>
           <label for="${id}">${s.useDefaultValue ? 'Default Setting Value' : 'Setting Value'}</label>
           ${input}
+          ${this.validation.renderFieldErrorMessages('value')}
         </div>
         <div class='alignable-promo__buttons'>
           <div class='category-brand--secondary'>
