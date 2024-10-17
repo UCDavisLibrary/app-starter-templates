@@ -6,9 +6,9 @@ return html`
     <div class='l-basic--flipped'>
       <div class="l-content">
         <p>${this.settings.fooDescription}</p>
-        ${this.fooData.length ? html`
+        ${this.foo.list.value.length ? html`
           <div>
-            ${this.fooData.map(item => html`
+            ${this.foo.list.value.map(item => html`
               <div class='flex flex--align-center u-space-my--small'>
                 <div style='font-size:.7rem;'>
                   <a

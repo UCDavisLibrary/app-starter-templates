@@ -3,6 +3,7 @@ import { render } from "./app-page-foo.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import AppPageElement from '../mixins/AppPageElement.js';
 import SettingsController from '../controllers/SettingsController.js';
+import CorkModelController from '../controllers/CorkModelController.js';
 
 
 export default class AppPageFoo extends Mixin(LitElement)
@@ -11,7 +12,6 @@ export default class AppPageFoo extends Mixin(LitElement)
 
   static get properties() {
     return {
-      fooData: {type: Array}
     }
   }
 
@@ -21,6 +21,10 @@ export default class AppPageFoo extends Mixin(LitElement)
     this.fooData = [];
 
     this.settings = new SettingsController(this);
+    this.foo = new CorkModelController(
+      this, 'FooModel', [
+        {property: 'list', method: 'list', defaultValue: []}
+      ]);
 
     this._injectModel('FooModel');
 
@@ -49,16 +53,10 @@ export default class AppPageFoo extends Mixin(LitElement)
    */
   async getPageData(){
     const promises = [
-      this.FooModel.list(),
+      this.foo.list.get(),
       this.settings.get()
     ];
     return Promise.allSettled(promises);
-  }
-
-  _onFooListUpdate(e) {
-    if ( e.state === 'loaded' ) {
-      this.fooData = e.payload;
-    }
   }
 
   _onFooDeleteUpdate(e) {
