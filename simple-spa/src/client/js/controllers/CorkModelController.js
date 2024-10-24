@@ -3,6 +3,7 @@ import { getLogger, Registry } from '@ucd-lib/cork-app-utils';
 /**
  * @description Controller for fetching data using a Cork model.
  * Will automatically set property and request host update if the data request is successful.
+ * Currently, does not leverage cork update events, so properties will be updated every time the get method is called.
  * @example
  * import CorkModelController from './CorkModelController.js';
  *
@@ -44,7 +45,7 @@ export default class CorkModelController {
    */
   _initProperties(){
     for (let config of this.propertyMapper) {
-      if ( typeof !this.model[config.method] === 'function' ) {
+      if ( typeof this.model[config.method] !== 'function' ) {
         this.logger.warn(`Method ${config.method} not found on model ${this.model.constructor.name}`);
         continue;
       }

@@ -1,7 +1,7 @@
 import BaseService from "./BaseService.js";
 import FooStore from '../stores/FooStore.js';
 import { appConfig } from '../../appGlobals.js';
-import payload from '../../utils/corkPayload.js';
+import payload from '../payload.js';
 
 class FooService extends BaseService {
 
