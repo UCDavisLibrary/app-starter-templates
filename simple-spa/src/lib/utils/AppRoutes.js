@@ -1,14 +1,13 @@
 /**
  * @description AppRoutes class for managing routes in a single page application
- * @property {Array} routes - array of route objects with the following properties:
- * - routeId {String} - unique identifier for the route
- * - pageId {String} - unique identifier for the page - how the main ucdlib-pages element knows which page to show
- * - pathSegment {String} - the path segment for the route (e.g. 'foo' for https://example.com/foo). '*' is a wildcard
- * - pageTitle {String} - the page title - can be dynamically set from within app by setDynamicPageTitle method
- * - breadcrumbText {String} - the breadcrumb text - can be dynamically set from within app by setDynamicPageBreadcrumbText method
- * - parent {String} - routeId of the parent route
- * - isHome {Boolean} - true if this is the home page
- *
+ * @property {Object[]} routes - array of route object configuration
+ * @property {String} routes[].routeId - unique identifier for the route
+ * @property {String} routes[].pageId - unique identifier for the page - how the main ucdlib-pages element knows which page to show
+ * @property {String} routes[].pathSegment - the path segment for the route (e.g. 'foo' for https://example.com/foo). '*' is a wildcard
+ * @property {String} routes[].pageTitle - the page title - can be dynamically set from within app by setDynamicPageTitle method
+ * @property {String} routes[].breadcrumbText - the breadcrumb text - can be dynamically set from within app by setDynamicPageBreadcrumbText method
+ * @property {String} routes[].parent - routeId of the parent route
+ * @property {Boolean} routes[].isHome - true if this is the home page
  */
 class AppRoutes {
 
