@@ -13,7 +13,8 @@ fi
 
 # Main version number we are tagging the app with. Always update
 # this when you cut a new version of the app!
-APP_VERSION=v0.0.9.${BUILD_NUM}
+APP_SEMVER=0.0.9
+APP_VERSION=v${APP_SEMVER}.${BUILD_NUM}
 
 # TODO: change to match name of your app
 # This will be used to name the container image among other things
@@ -29,7 +30,8 @@ APP_CONTAINER_PORT=3000
 # Repository tags/branchs
 # Tags should always be used for production deployments
 # Branches can be used for development deployments
-REPO_TAG=main
+REPO_TAG=dev
+#REPO_TAG=v${APP_SEMVER}
 
 # Dependency tags/branches
 # TODO: change these versions to match current LTS versions
