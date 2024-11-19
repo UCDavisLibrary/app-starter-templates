@@ -1,5 +1,4 @@
 import appRoutes from "../../../lib/utils/appRoutes.js";
-import ValidationContoller from "../controllers/ValidationController.js";
 
 /**
  * @description Mixin for app page elements
@@ -10,8 +9,6 @@ export default (superClass) => class extends superClass {
   constructor() {
     super();
     this._injectModel('AppStateModel');
-
-    this.validation = new ValidationContoller(this);
   }
 
   // disable the shadow dom

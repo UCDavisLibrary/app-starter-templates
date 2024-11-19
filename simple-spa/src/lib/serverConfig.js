@@ -104,6 +104,23 @@ class ServerConfig {
   }
 
   /**
+   * @description Get default page size for a given entity
+   * (e.g. number of items returned in API query).
+   * @param {String} entity - The entity for which to get the page size. Optional.
+   * @returns {Number} The default page size.
+   */
+  getPageSize(entity){
+    const envPrefix = 'APP_PAGE_SIZE';
+    let n;
+    if ( entity ){
+      const env = this.getEnv(`${envPrefix}_${entity.toUpperCase()}`);
+      if ( env ) n = parseInt(env);
+    }
+    if ( !n ) n = parseInt(this.getEnv(`${envPrefix}`, 10));
+    return n
+  }
+
+  /**
    * @description Get an environment variable.  If the variable is not set, return the default value.
    * @param {String} name - The name of the environment variable.
    * @param {*} defaultValue - The default value to return if the environment variable is not set.

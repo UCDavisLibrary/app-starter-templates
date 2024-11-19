@@ -1,0 +1,25 @@
+no-results {
+  .main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .icon {
+    color: #13639e;
+    width: 5%;
+    min-width: 30px;
+    max-width: 50px;
+  }
+  .main-text {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .sub-text {
+    font-size: 1rem;
+    color: rgb(91, 91, 91);
+  }
+}

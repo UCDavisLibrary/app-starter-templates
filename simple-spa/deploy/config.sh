@@ -35,8 +35,8 @@ REPO_TAG=dev
 
 # Dependency tags/branches
 # TODO: change these versions to match current LTS versions
-NODE_TAG=18
-POSTGRES_TAG=15.3
+NODE_TAG=22
+POSTGRES_TAG=17
 ADMINER_TAG=4.8.1 # for local dev only
 
 # Container Registery

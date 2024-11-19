@@ -3,6 +3,7 @@ import { render } from "./app-page-admin-settings.tpl.js";
 import { LitCorkUtils, Mixin } from '@ucd-lib/cork-app-utils';
 import AppPageElement from '../../mixins/AppPageElement.js';
 import { createRef } from 'lit/directives/ref.js';
+import ValidationContoller from '../../controllers/ValidationController.js';
 
 
 export default class AppPageAdminSettings extends Mixin(LitElement)
@@ -28,6 +29,7 @@ export default class AppPageAdminSettings extends Mixin(LitElement)
     this.settings = [];
     this.editModalRef = createRef();
     this.editSetting = {};
+    this.validation = new ValidationContoller(this);
 
     this._injectModel('SettingsModel');
   }

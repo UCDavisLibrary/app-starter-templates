@@ -37,6 +37,15 @@ export default class ValidationContoller {
   }
 
   /**
+   * @description Clear errors for a specific field
+   * @param {String} field - field name
+   */
+  clearErrorByField(field){
+    delete this.errorsByField[field];
+    this.host.requestUpdate();
+  }
+
+  /**
    * @description Parse the error response from the server
    * @param {Object} res - Cork-app-utils response object
    */

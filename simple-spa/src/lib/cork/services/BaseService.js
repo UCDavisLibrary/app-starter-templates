@@ -29,6 +29,29 @@ export default class BaseServiceImp extends BaseService {
     return await super.request(options);
   }
 
+  async clearCache(serviceResponse){
+    if ( !this.storeCaches?.length ) return;
+    if ( !serviceResponse ) {
+      this.storeCaches.forEach(store => store.purge());
+      return;
+    };
+    if ( serviceResponse instanceof Promise ) {
+      serviceResponse = await serviceResponse;
+    }
+    if ( serviceResponse?.request instanceof Promise ) {
+      await serviceResponse.request;
+      if ( !serviceResponse.id ){
+        this.logger.warn(`Unable to clear cache. Response does not have an id`, serviceResponse);
+      } else if ( !serviceResponse.store ){
+        this.logger.warn(`Unable to clear cache. Response does not have a store`, serviceResponse);
+      }
+      serviceResponse = serviceResponse.store.get(serviceResponse.id);
+    }
+    if ( serviceResponse?.state === 'loaded' ){
+      this.storeCaches.forEach(store => store.purge());
+    }
+  }
+
   /**
    * @description Log if 500+ error. Will report to google cloud if APP_REPORT_ERRORS_ENABLED=true
    * @param {*} options

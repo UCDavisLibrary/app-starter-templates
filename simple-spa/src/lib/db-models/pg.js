@@ -108,7 +108,7 @@ class Pg {
    * @param {Object} obj - key value pairs for clause
    * @returns {Object} {keys: ['foo', 'bar'], values: ['fooValue', 'barValue'], placeholders: ['$1', '$2']}
    */
-  prepareObjectForInsert(obj){
+  prepareObjectForInsert(obj, kwargs){
     obj = this._filterObject(obj, kwargs?.includeFields, kwargs?.excludeFields);
     const out = {keys: [], values: [], placeholders: []};
     for (const k in obj) {
