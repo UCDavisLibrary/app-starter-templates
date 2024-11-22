@@ -1,5 +1,7 @@
 import { getLogger, Registry } from '@ucd-lib/cork-app-utils';
 import ValidationContoller from './ValidationController.js';
+import IdGenerator from '../../../lib/utils/IdGenerator.js';
+import { html } from 'lit';
 
 /**
  * @description Controller for simple CRUD operations using a Cork model.
@@ -27,13 +29,18 @@ import ValidationContoller from './ValidationController.js';
  * <form @submit=${payload.create}>
  *  ${ payload.validation.renderErrorMessage() }
  *  <div class='field-container ${payload.validation.fieldErrorClass('name')}'>
- *    <label>Application Name</label>
+ *    <label>Foo Name</label>
  *    <input
  *      type='text'
  *      .value=${payload.get('name')}
  *      @input=${e => payload.set('name', e.target.value)} />
  *    ${ payload.validation.renderFieldErrorMessages('name') }
  *  </div>
+ * </form>
+ *
+ * // or user the renderInput method
+ * <form @submit=${payload.create}>
+ *  ${ payload.renderInput({prop: 'name', label: 'Foo Name'}) }
  * </form>
  */
 export default class CorkModelController {
@@ -47,28 +54,131 @@ export default class CorkModelController {
    * @param {String} propertyMapper[].method - The method name to call on the model
    * @param {Function} propertyMapper[].transform - An optional function to transform the response payload before setting the property
    * @param {Any} propertyMapper[].defaultValue - The default value for the property
+   * @param {Object} payloadConfig - Configuration for the payload object
+   * @param {Object} payloadConfig.defaults - Default values for the payload data
    */
   constructor(host, modelName, propertyMapper=[], payloadConfig={}) {
     this.logger = getLogger(`${modelName}Controller`);
     this.host = host;
     host.addController(this);
+    this.idGen = new IdGenerator({randomPrefix: true});
     this.model = Registry.getModel(modelName);
     this.AppStateModel = Registry.getModel('AppStateModel');
     this.propertyMapper = propertyMapper;
     this._initProperties();
 
     // setup create/update payload
+    // this should really be its own class
     this.payloadConfig = payloadConfig;
     this.payload = {
-      data: {},
       validation: new ValidationContoller(host),
+      renderInput: (...args) => this._renderPayloadInput(...args),
+      renderCheckbox: (...args) => this._renderPayloadCheckbox(...args),
+      renderTextarea: (...args) => this._renderPayloadTextarea(...args),
       set: (...args) => this._setPayloadProperty(...args),
+      setObj: (...args) => this._setPayloadObjProperty(...args),
       toggle: (...args) => this._togglePayloadProperty(...args),
       get: (...args) => this._getPayloadProperty(...args),
       clear: () => this._clearPayload(),
       create: async (e) => await this._submitPayload('create', e),
       update: async (e) => await this._submitPayload('update', e)
     };
+    this.payload.clear();
+  }
+
+  _renderPayloadTextarea(kwargs={}){
+    let {
+      prop, label, placeholder='',
+      disabled=false, rows=5, obj, errorField
+    } = kwargs;
+
+    errorField = errorField || prop;
+    const value = obj ? obj[prop] : this.payload.get(prop);
+    const input = obj ?
+      e => this.payload.setObj(prop, e.target.value, obj, errorField) :
+      e => this.payload.set(prop, e.target.value);
+
+    const payload = this.payload;
+    const validation = payload.validation;
+    const idGen = this.idGen;
+
+    return html`
+      <div class='field-container ${validation.fieldErrorClass(errorField)}'>
+        <label for=${idGen.get(errorField)}>${label}</label>
+        <textarea
+          id=${idGen.get(errorField)}
+          .value=${value}
+          rows=${rows}
+          placeholder=${placeholder}
+          ?disabled=${disabled}
+          @input=${input}>
+        </textarea>
+        ${ validation.renderFieldErrorMessages(errorField) }
+      </div>
+    `;
+  }
+
+  _renderPayloadCheckbox(kwargs={}){
+    let {
+      prop, label, disabled=false,
+      obj, errorField
+    } = kwargs;
+
+    errorField = errorField || prop;
+    const value = obj ? obj[prop] : this.payload.get(prop);
+    const input = obj ?
+      () => this.payload.setObj(prop, !value, obj, errorField) :
+      () => this.payload.toggle(prop);
+
+    const payload = this.payload;
+    const validation = payload.validation;
+    const idGen = this.idGen;
+
+    return html`
+      <div class='field-container ${validation.fieldErrorClass(errorField)}'>
+        <div class='checkbox'>
+          <input
+            id=${idGen.get(errorField)}
+            type='checkbox'
+            ?disabled=${disabled}
+            .checked=${value}
+            @input=${input} />
+          <label for=${idGen.get(errorField)}>${label}</label>
+        </div>
+        ${ validation.renderFieldErrorMessages(errorField) }
+      </div>
+    `;
+  }
+
+  _renderPayloadInput(kwargs={}){
+    let {
+      prop, type='text', label, placeholder='',
+      disabled=false, obj, errorField
+    } = kwargs;
+
+    errorField = errorField || prop;
+    const value = obj ? obj[prop] : this.payload.get(prop);
+    const input = obj ?
+      e => this.payload.setObj(prop, e.target.value, obj, errorField) :
+      e => this.payload.set(prop, e.target.value);
+
+    const payload = this.payload;
+    const validation = payload.validation;
+    const idGen = this.idGen;
+
+    return html`
+      <div class='field-container ${validation.fieldErrorClass(errorField)}'>
+        <label for=${idGen.get(errorField)}>${label}</label>
+        <input
+          id=${idGen.get(errorField)}
+          type=${type}
+          placeholder=${placeholder}
+          ?disabled=${disabled}
+          .value=${value}
+          @input=${input} />
+        ${ validation.renderFieldErrorMessages(errorField) }
+      </div>
+    `;
   }
 
   /**
@@ -78,6 +188,14 @@ export default class CorkModelController {
    */
   setPayloadData(data){
     data = JSON.parse(JSON.stringify(data));
+
+    // set defaults
+    const defaults = JSON.parse(JSON.stringify(this.payloadConfig.defaults || {}));
+    for ( let prop in defaults ) {
+      if ( data[prop] === undefined ) {
+        data[prop] = this.payloadConfig.defaults[prop];
+      }
+    }
     this.payload.data = data;
     this.payload.validation.reset();
   }
@@ -102,24 +220,32 @@ export default class CorkModelController {
     this.host.requestUpdate();
   }
 
+  _setPayloadObjProperty(prop, value, obj, errorField){
+    obj[prop] = value;
+    if ( errorField ) {
+      this.payload.validation.clearErrorByField(errorField);
+    }
+    this.host.requestUpdate();
+
+  }
+
   /**
    * @description Get a property from the payload data or the default value
    * @param {String} prop - The property name to get
    * @returns {*} The property value
    */
-  _getPayloadProperty(prop){
+  _getPayloadProperty(prop, defaultValue=''){
     if ( this.payload.data[prop] !== undefined ) {
       return this.payload.data[prop];
     }
-    return this.payloadConfig?.defaults?.[prop] || '';
+    return defaultValue;
   }
 
   /**
    * @description Clear the payload data and reset any validation errors
    */
   _clearPayload(){
-    this.payload.data = {};
-    this.payload.validation.reset();
+    this.setPayloadData({});
   }
 
   /**
@@ -180,8 +306,8 @@ export default class CorkModelController {
         return;
       }
 
-      // show the page
-      this.host.show();
+      // reload the page
+      this.AppStateModel.refresh();
     }
 
   };

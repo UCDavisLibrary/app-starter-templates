@@ -33,14 +33,15 @@ export default (superClass) => class extends superClass {
    * @returns
    */
   showPageTitle(title){
+    if ( typeof title === 'string' ){
+      this.AppStateModel.setTitle(title);
+      return;
+    }
     if ( !this.routeId ){
       this.logger.error('showPageTitle: routeId not set');
       return;
     }
-    if ( typeof title === 'string' ){
-      this.AppStateModel.setTitle(title);
-      return;
-    } else if ( typeof title === 'function' ){
+    if ( typeof title === 'function' ){
       appRoutes.setDynamicPageTitle(this.routeId, title);
     }
     const pageTitle = appRoutes.pageTitle(this.routeId);
@@ -55,7 +56,7 @@ export default (superClass) => class extends superClass {
     this.AppStateModel.setTitle({show: false});
   }
 
-  showBreadcrumbs(){
+  showBreadcrumbs(dynamicValues=[]){
     if ( !this.routeId ){
       this.logger.error('showPageTitle: routeId not set');
       return;
@@ -68,9 +69,28 @@ export default (superClass) => class extends superClass {
       excludeHome = true;
     }
     const breadcrumbs = appRoutes.breadcrumbs(this.routeId, excludeHome);
+
+    if ( dynamicValues.length ){
+      let hasWildcardCount = 0;
+      for( const crumb of breadcrumbs ){
+        const wildcardCount = (crumb.link.match(/\*/g) || []).length;
+        if ( !wildcardCount ) continue;
+        hasWildcardCount++;
+        for ( let i = 0; i < wildcardCount; i++ ){
+          if ( !dynamicValues[i] ){
+            this.logger.warning('showBreadcrumbs: dynamicValues not set for all wildcards');
+            continue;
+          }
+          crumb.link = crumb.link.replace('*', dynamicValues[i].pathPart);
+        }
+        if ( dynamicValues[hasWildcardCount - 1]?.text ){
+          crumb.text = dynamicValues[hasWildcardCount - 1].text;
+        }
+      }
+    }
     this.logger.debug('Breadcrumbs', breadcrumbs);
     this.AppStateModel.setBreadcrumbs(breadcrumbs);
-  };
+  }
 
   hideBreadcrumbs(){
     this.AppStateModel.setBreadcrumbs(false);

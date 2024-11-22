@@ -211,6 +211,18 @@ class AppStateModelImpl extends AppStateModel {
     const errors = responseArray.filter(r => r.value.state === 'error').map(r => r.value);
     if ( !errors.length ) return false;
 
+    // look for a meaningful error message in the response
+    // as formatted by apiUtils server methods
+    const meaningfulError = errors.find(e => e?.error?.payload?.errorMessage || e?.error?.payload?.errorHeading);
+    if ( meaningfulError ){
+      this.showError(
+        customErrorMessage || meaningfulError.error.payload.errorMessage,
+        customErrorHeading || meaningfulError.error.payload.errorHeading,
+        meaningfulError.error.payload.serverLogId
+      );
+      return true;
+    }
+
     // handle standard responses
     const standardResponses = [
       [404, (e) => `Service endpoint not found: ${e.error?.response?.url || ''}`],
@@ -223,18 +235,6 @@ class AppStateModelImpl extends AppStateModel {
         this.showError(customErrorMessage || sr[1](error), customErrorHeading);
         return true;
       }
-    }
-
-    // look for a meaningful error message
-    // as formatted by apiUtils.return500IfDbError server method
-    const meaningfulError = errors.find(e => e?.error?.payload?.errorMessage || e?.error?.payload?.errorHeading);
-    if ( meaningfulError ){
-      this.showError(
-        customErrorMessage || meaningfulError.error.payload.errorMessage,
-        customErrorHeading || meaningfulError.error.payload.errorHeading,
-        meaningfulError.error.payload.serverLogId
-      );
-      return true;
     }
 
     this.showError(customErrorMessage, customErrorHeading);

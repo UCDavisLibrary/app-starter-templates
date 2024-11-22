@@ -60,9 +60,31 @@ export default class Validator {
     // default behavior is to convert dbName to jsonName
     if ( this.keyType != this.errorKeyType ) {
       this.fieldsWithErrors.forEach(field => {
-        field.fieldId = this.fields.find(f => f[this.keyType] === field.fieldId)[this.errorKeyType];
+        const f = this.fields.find(f => f[this.keyType] === field.fieldId);
+        if ( f ){
+          field.fieldId = f[this.errorKeyType];
+        }
       });
     }
+  }
+
+  /**
+   * @description Merge fields with errors from another validator
+   * @param {Array} fieldsWithErrors - fieldsWithErrors array from another validator
+   * @param {String} prefix - prefix to add to fieldId of new fields
+   * @returns
+   */
+  mergeFieldsWithErrors(fieldsWithErrors, prefix){
+    if ( !fieldsWithErrors?.length ) return;
+    if ( prefix ) {
+      fieldsWithErrors = fieldsWithErrors.map(field => {
+        field = JSON.parse(JSON.stringify(field));
+        field.fieldId = `${prefix}.${field.fieldId}`;
+        return field;
+      });
+    }
+    this.fieldsWithErrors = this.fieldsWithErrors.concat(fieldsWithErrors);
+    this.valid = false;
   }
 
   /**
@@ -121,8 +143,11 @@ export default class Validator {
       'string': this.isString,
       'number': this.isNumber,
       'integer': this.isInteger,
+      'array': Array.isArray,
       'positive-integer': this.isPositiveInteger,
+      'non-negative-integer': this.isNonNegativeInteger,
       'positive-number': this.isPositiveNumber,
+      'non-negative-number': this.isNonNegativeNumber,
       'boolean': this.isBoolean,
       'iso-date': this.isIsoDate,
       'iso-datetime': this.isIsoDatetime
@@ -219,7 +244,8 @@ export default class Validator {
    * @returns
    */
   isBoolean(value){
-    return typeof value === 'boolean';
+    const values = ['true', 'false', true, false, 1, 0];
+    return values.includes(value);
   }
 
   /**
