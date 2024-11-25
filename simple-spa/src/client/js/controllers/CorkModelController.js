@@ -38,7 +38,7 @@ import { html } from 'lit';
  *  </div>
  * </form>
  *
- * // or user the renderInput method
+ * // or use the renderInput method
  * <form @submit=${payload.create}>
  *  ${ payload.renderInput({prop: 'name', label: 'Foo Name'}) }
  * </form>
@@ -75,9 +75,13 @@ export default class CorkModelController {
       renderInput: (...args) => this._renderPayloadInput(...args),
       renderCheckbox: (...args) => this._renderPayloadCheckbox(...args),
       renderTextarea: (...args) => this._renderPayloadTextarea(...args),
+      renderRepeaterAddButton: (...args) => this._renderRepeaterAddButton(...args),
+      renderRepeaterDeleteButton: (...args) => this._renderRepeaterDeleteButton(...args),
       set: (...args) => this._setPayloadProperty(...args),
       setObj: (...args) => this._setPayloadObjProperty(...args),
       toggle: (...args) => this._togglePayloadProperty(...args),
+      push: (...args) => this._pushPayloadProperty(...args),
+      splice: (...args) => this._splicePayloadProperty(...args),
       get: (...args) => this._getPayloadProperty(...args),
       clear: () => this._clearPayload(),
       create: async (e) => await this._submitPayload('create', e),
@@ -86,6 +90,18 @@ export default class CorkModelController {
     this.payload.clear();
   }
 
+  /**
+   * @description Render a textarea input for the payload data
+   * @param {Object} kwargs - Keyword arguments
+   * @param {String} kwargs.prop - The property name to set on the payload data
+   * @param {String} kwargs.label - The label for the input
+   * @param {String} kwargs.placeholder - The placeholder text for the input
+   * @param {Boolean} kwargs.disabled - Whether the input should be disabled
+   * @param {Number} kwargs.rows - The number of rows for the textarea
+   * @param {Object} kwargs.obj - If textarea is mapped to an object property on the payload data, pass the object here
+   * @param {String} kwargs.errorField - The error field name to use for validation, defaults to the prop name
+   * @returns {TemplateResult}
+   */
   _renderPayloadTextarea(kwargs={}){
     let {
       prop, label, placeholder='',
@@ -118,6 +134,16 @@ export default class CorkModelController {
     `;
   }
 
+  /**
+   * @description Render a checkbox input for the payload data
+   * @param {Object} kwargs - Keyword arguments
+   * @param {String} kwargs.prop - The property name to set on the payload data
+   * @param {String} kwargs.label - The label for the input
+   * @param {Boolean} kwargs.disabled - Whether the input should be disabled
+   * @param {Object} kwargs.obj - If checkbox is mapped to an object property on the payload data, pass the object here
+   * @param {String} kwargs.errorField - The error field name to use for validation, defaults to the prop name
+   * @returns {TemplateResult}
+   */
   _renderPayloadCheckbox(kwargs={}){
     let {
       prop, label, disabled=false,
@@ -150,6 +176,18 @@ export default class CorkModelController {
     `;
   }
 
+  /**
+   * @description Render a text input for the payload data
+   * @param {Object} kwargs - Keyword arguments
+   * @param {String} kwargs.prop - The property name to set on the payload data
+   * @param {String} kwargs.type - The input type
+   * @param {String} kwargs.label - The label for the input
+   * @param {String} kwargs.placeholder - The placeholder text for the input
+   * @param {Boolean} kwargs.disabled - Whether the input should be disabled
+   * @param {Object} kwargs.obj - If input is mapped to an object property on the payload data, pass the object here
+   * @param {String} kwargs.errorField - The error field name to use for validation, defaults to the prop name
+   * @returns
+   */
   _renderPayloadInput(kwargs={}){
     let {
       prop, type='text', label, placeholder='',
@@ -182,6 +220,52 @@ export default class CorkModelController {
   }
 
   /**
+   * @description Render a button to delete an item from a repeater property on the payload data
+   * @param {Object} kwargs - Keyword arguments
+   * @param {String} kwargs.prop - The property name to splice from
+   * @param {Number} kwargs.index - The index to splice
+   * @param {String} kwargs.label - The label for the button
+   * @param {Boolean} kwargs.disabled - Whether the button should be disabled
+   * @returns {TemplateResult}
+   */
+  _renderRepeaterDeleteButton(kwargs={}){
+    let {
+      prop, index, label='Delete', disabled=false,
+    } = kwargs;
+
+    const cb = disabled ? () => {} : () => this._splicePayloadProperty(prop, index);
+    return html`
+      <a class='icon-link' @click=${cb}>
+        <i class="fa-solid fa-circle-minus double-decker"></i>
+        <span>${label}</span>
+      </a>
+    `;
+  }
+
+  /**
+   * @description Render a button to add a new item to a repeater property on the payload data
+   * @param {Object} kwargs - Keyword arguments
+   * @param {String} kwargs.prop - The property name to push to
+   * @param {String} kwargs.label - The label for the button
+   * @param {String} kwargs.value - The value to push to the property
+   * @param {Boolean} kwargs.disabled - Whether the button should be disabled
+   * @returns {TemplateResult}
+   */
+  _renderRepeaterAddButton(kwargs={}){
+    let {
+      prop, label, value, disabled=false,
+    } = kwargs;
+
+    const cb = disabled ? () => {} : () => this.payload.push(prop, value);
+    return html`
+      <a class='icon-link' @click=${cb}>
+        <i class="fa-solid fa-circle-plus quad"></i>
+        <span>${label}</span>
+      </a>
+    `;
+  }
+
+  /**
    * @description Set the payload data and reset the validation errors
    * Makes a deep copy of the data to avoid reference issues
    * @param {Object} data
@@ -198,6 +282,31 @@ export default class CorkModelController {
     }
     this.payload.data = data;
     this.payload.validation.reset();
+  }
+
+  /**
+   * @description Push a value to an array property on the payload data
+   * @param {String} prop - The property name to push to
+   * @param {*} value - The value to push
+   */
+  _pushPayloadProperty(prop, value){
+    if ( !Array.isArray(this.payload.data[prop]) ) {
+      this.payload.data[prop] = [];
+    }
+    this.payload.data[prop].push(value);
+    this.payload.validation.clearErrorByField(prop);
+    this.host.requestUpdate();
+  }
+
+  /**
+   * @description Splice a value from an array property on the payload data
+   * @param {String} prop - The property name to splice from
+   * @param {Number} index - The index to splice
+   */
+  _splicePayloadProperty(prop, index){
+    this.payload.data[prop].splice(index, 1);
+    this.payload.validation.clearErrorByField(prop);
+    this.host.requestUpdate();
   }
 
   /**
